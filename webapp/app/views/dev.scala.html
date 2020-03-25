@@ -1,0 +1,56 @@
+<html>
+<head>
+    <title>Taxero Dev Tool</title>
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/jquery.dataTables.min.css"/>
+    <!-- <link rel="stylesheet" type="text/css" href="assets/brat/static/style-vis.css"/> -->
+    <!-- <script type="text/javascript" src="assets/brat/client/lib/head.load.min.js"></script> -->
+    <script type="text/javascript" src="assets/javascripts/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="assets/javascripts/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="assets/javascripts/dev.js"></script>
+</head>
+
+<body>
+<h1>Taxero</h1>
+
+<div id="overlay">
+    <div id="loading">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="assets/images/loading.svg"><br />
+        Reading text...
+    </div>
+</div>
+
+<form>
+    <label for="query">Query:</label>
+    <input type="text" id="query">
+    <br>
+    <label for="rules">Rules:</label>
+    <textarea id="rules" rows="10" cols="100">
+vars:
+  result: "(?<result> [tag=/J.*/]{,3} [tag=/N.*/]+ (of [tag=DT]? [tag=/J.*/]{,3} [tag=/N.*/]+)?)"
+
+rules:
+  - name: example-rule
+    type: basic   # or event
+    pattern: |
+      ${query} >nmod_such_as >/conj.*/? ${result}
+    </textarea>
+    <br>
+    <input type="submit">
+</form>
+
+<table id="results" class="display" width="100%">
+    <!--Add the header row to the table-->
+    <thead>
+    <tr>
+    <th></th>
+    <th>Query</th>
+    <th>Result</th>
+    <th>Count</th>
+    <th>Similarity</th>
+    <th>Score</th>
+    </tr>
+    </thead>
+</table>
+</body>
+</html>
