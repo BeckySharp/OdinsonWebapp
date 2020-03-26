@@ -16,6 +16,7 @@ function format ( d ) {
 }
 
 function ruleDisplay (r) {
+    var rule = r.rule
     var arguments = r.arguments[0];
     var data = []
     var results = r.results
@@ -31,7 +32,7 @@ function ruleDisplay (r) {
         data.push(cells)
     }
 
-    return [arguments, data];
+    return [arguments, data, rule];
 
 }
 
@@ -133,13 +134,15 @@ $(document).ready(function () {
                 var arguments = ruleData[0]
                 var nArgs = arguments.length
                 var ruleRows = ruleData[1]
+                var ruleName = ruleData[2]
+                $('#tablecaption').text(ruleName);
                 $('#results').DataTable({
                     destroy: true,
                     data: ruleRows,
                     // dynamically make the column headers to match the argument names
                     columnDefs: mkColumnDefs(arguments),
                     // dynamically make the columns with data for this rule
-                    columns: mkColumns(nArgs)
+                    columns: mkColumns(nArgs),
                     });
             }
 

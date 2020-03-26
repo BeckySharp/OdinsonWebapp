@@ -15,6 +15,7 @@ table, th,td {
 
 h1 {
     font-size: 150%;
+    color: #0C28C4;
 }
 
 h2 {
@@ -56,4 +57,12 @@ td.details-control {
 }
 tr.shown td.details-control {
     background: url('/assets/images/toggle.png') no-repeat center center;
+}
+caption {
+  text-align: left;
+  color: #0C28C4;
+  background: #D6DCFA ;
+  font-size: 1.3em;
+  margin-left: -1px; /* Fix FF 1px issue */
+  padding: 5px;
 }
