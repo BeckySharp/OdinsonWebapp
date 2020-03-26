@@ -27,6 +27,7 @@ function ruleDisplay (r) {
             cells[jString] = curr.result[0][j]
         }
         cells["count"] = curr.count
+        cells["evidence"] = curr.evidence
         data.push(cells)
     }
 
@@ -127,8 +128,6 @@ $(document).ready(function () {
             alert("request failed: " + textStatus);
         })
         .done(function (data) {
-            console.log(data);
-
             for (let i = 0; i < data.length; i++) {
                 var ruleData = ruleDisplay(data[i])
                 var arguments = ruleData[0]
