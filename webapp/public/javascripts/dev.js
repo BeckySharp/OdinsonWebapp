@@ -15,6 +15,73 @@ function format ( d ) {
     return t + '</table>';
 }
 
+function ruleDisplay (r) {
+    var arguments = r.arguments[0];
+    var data = []
+    var results = r.results
+    for (let i = 0; i < results.length; i ++) {
+        cells = {}
+        var curr = results[i]
+        for (let j = 0; j < arguments.length; j ++) {
+            var jString = j.toString()
+            cells[jString] = curr.result[0][j]
+        }
+        cells["count"] = curr.count
+        data.push(cells)
+    }
+
+    return [arguments, data];
+
+}
+
+function mkColumns(nArgs) {
+    var columns = [];
+    columns.push({
+         "className":      'details-control',
+         "orderable":      false,
+         "data":           null,
+         "defaultContent": ''
+     });
+    for (let i = 0; i < nArgs; i ++) {
+       var cell = {};
+       cell.data = i.toString();
+       columns.push(cell);
+    }
+    columns.push({data: "count"})
+    return columns;
+}
+
+function mkColumnDefs(arguments) {
+    var columnDefs = [];
+
+    // The expand/collapse column
+    var firstCol = {};
+    firstCol.targets = 0;
+    firstCol.className ="dt-center";
+    firstCol.width = "5px";
+    columnDefs.push(firstCol);
+
+    // Argument columns
+    for (let i = 0; i < arguments.length; i++) {
+       var cell = {};
+       cell.targets = i+1;
+       cell.title = arguments[i]
+       columnDefs.push(cell);
+    }
+
+    // Count column
+    var cell = {};
+    cell.targets = arguments.length + 1;
+    cell.title = "count";
+    cell.className ="dt-center";
+    cell.width = "30px";
+    columnDefs.push(cell);
+
+    return columnDefs;
+}
+
+
+
 $(document).ready(function () {
 
     $('form').submit(function (event) {
@@ -23,21 +90,23 @@ $(document).ready(function () {
         event.preventDefault();
 
         // collect form data
-        var query = $('#query').val();
         var rules = $('#rules').val();
         var formData = {
-            'query': query,
             'rules': rules
         }
 
-        if (!formData.query.trim()) {
+        if (!formData.rules.trim()) {
             alert("Please write something.");
             return;
         }
 
         if ($.fn.DataTable.isDataTable('#results')) {
             $('#results').DataTable().clear().destroy();
+            // to handle the fact that the thead remnants stay around:
+            // ref: https://datatables.net/forums/discussion/20524/destroy-issue
+            $('#results').empty();
         }
+
 
         // show spinner
         document.getElementById("overlay").style.display = "block";
@@ -59,22 +128,22 @@ $(document).ready(function () {
         })
         .done(function (data) {
             console.log(data);
-            $('#results').DataTable({
-                data: data,
-                columns: [
-                    {
-                        "className":      'details-control',
-                        "orderable":      false,
-                        "data":           null,
-                        "defaultContent": ''
-                    },
-                    { data: "query" },
-                    { data: "result" },
-                    { data: "count" },
-                    { data: "similarity" },
-                    { data: "score" }
-                ]
-            });
+
+            for (let i = 0; i < data.length; i++) {
+                var ruleData = ruleDisplay(data[i])
+                var arguments = ruleData[0]
+                var nArgs = arguments.length
+                var ruleRows = ruleData[1]
+                $('#results').DataTable({
+                    destroy: true,
+                    data: ruleRows,
+                    // dynamically make the column headers to match the argument names
+                    columnDefs: mkColumnDefs(arguments),
+                    // dynamically make the columns with data for this rule
+                    columns: mkColumns(nArgs)
+                    });
+            }
+
             // hide spinner
             document.getElementById("overlay").style.display = "none";
         });

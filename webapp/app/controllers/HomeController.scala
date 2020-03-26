@@ -1,9 +1,9 @@
 package controllers
 
 import javax.inject._
+import org.clulab.reading.CorpusReader
 import play.api.mvc._
 import play.api.libs.json._
-import org.clulab.taxero._
 
 import scala.collection.mutable
 
@@ -15,9 +15,9 @@ import scala.collection.mutable
 class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
 
   // -------------------------------------------------
-  println("Taxero is getting started ...")
-  val taxero = TaxonomyReader.fromConfig
-  println("Taxero is ready to go ...")
+  println("CorpusReader is getting started ...")
+  val reader = CorpusReader.fromConfig
+  println("CorpusReader is ready to go ...")
   // -------------------------------------------------
 
   /**
@@ -27,48 +27,19 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
    * will be called when the application receives a `GET` request with
    * a path of `/`.
    */
-  def index() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.index())
-  }
+//  def index() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.index())
+//  }
 
   def dev() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.dev())
   }
 
-  def getHypernyms(query: String) = Action {
-    val tokens = query.split(" ")
-    val hypernyms = taxero.getRankedHypernyms(tokens)
-    val json = JsonUtils.mkJson(hypernyms)
-    Ok(json)
-  }
-
-  def getHyponyms(query: String) = Action {
-    val tokens = query.split(" ")
-    val hyponyms = taxero.getRankedHyponyms(tokens)
-    val json = JsonUtils.mkJson(hyponyms)
-    Ok(json)
-  }
-
-  def getCohyponyms(query: String) = Action {
-    val tokens = query.split(" ")
-    val cohyponyms = taxero.getRankedCohyponyms(tokens)
-    val json = JsonUtils.mkJson(cohyponyms)
-    Ok(json)
-  }
-
-  def getExpandedHypernyms(query: String, n: Int) = Action {
-    val tokens = query.split(" ")
-    val hypernyms = taxero.getExpandedHypernyms(tokens, n)
-    val json = JsonUtils.mkJson(hypernyms)
-    Ok(json)
-  }
-
-  def getCustomRuleResults(query: String, rules: String) = Action {
+  def getCustomRuleResults(rules: String) = Action {
     // println(s"[DEV] Query: <<$query>>\tRULE: <<$rule>>")
-    val tokens = query.split(" ")
-    val results = taxero.executeGivenRules(tokens, rules)
-    println(s"num results: ${results.length}")
-    val json = JsonUtils.mkJsonDict(results.slice(0,3))
+    val resultsByRule = reader.getExtractions(rules)
+    println(s"num results: ${resultsByRule.toSeq.flatMap(_._2).length}")
+    val json = JsonUtils.mkJsonDict(resultsByRule)
     println(Json.prettyPrint(json))
     Ok(json)
   }

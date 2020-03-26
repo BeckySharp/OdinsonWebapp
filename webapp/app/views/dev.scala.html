@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Taxero Dev Tool</title>
+    <title>Odinson Rule Development UI</title>
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/jquery.dataTables.min.css"/>
     <!-- <link rel="stylesheet" type="text/css" href="assets/brat/static/style-vis.css"/> -->
@@ -11,7 +11,7 @@
 </head>
 
 <body>
-<h1>Taxero</h1>
+<h1>Odinson Rule Development UI</h1>
 
 <div id="overlay">
     <div id="loading">
@@ -21,9 +21,7 @@
 </div>
 
 <form>
-    <label for="query">Query:</label>
-    <input type="text" id="query">
-    <br>
+
     <label for="rules">Rules:</label>
     <textarea id="rules" rows="10" cols="100">
 vars:
@@ -33,24 +31,24 @@ rules:
   - name: example-rule
     type: basic   # or event
     pattern: |
-      ${query} >nmod_such_as >/conj.*/? ${result}
+      (?<A> [] ) (?<B> [] ) (?<C> [] )    (?<init> issues)
     </textarea>
     <br>
     <input type="submit">
 </form>
 
 <table id="results" class="display" width="100%">
-    <!--Add the header row to the table-->
-    <thead>
-    <tr>
-    <th></th>
-    <th>Query</th>
-    <th>Result</th>
-    <th>Count</th>
-    <th>Similarity</th>
-    <th>Score</th>
-    </tr>
-    </thead>
+<!--    &lt;!&ndash;Add the header row to the table&ndash;&gt;-->
+<!--    <thead>-->
+<!--    <tr>-->
+<!--    <th></th>-->
+<!--    <th>Query</th>-->
+<!--    <th>Result</th>-->
+<!--    <th>Count</th>-->
+<!--    <th>Similarity</th>-->
+<!--    <th>Score</th>-->
+<!--    </tr>-->
+<!--    </thead>-->
 </table>
 </body>
 </html>

@@ -61,8 +61,8 @@ class CorpusReader(
     val matches = getMatches(mentions)
     // Each rule may have different args and different numbers of args, so we'll need to display
     // them separately.
-    val groupByRule = matches.groupBy(_.foundBy)
-    for {
+    val groupByRule = matches.groupBy(_.foundBy).toSeq
+    val consolidated = for {
       (foundBy, matchGroup) <- groupByRule
       // count matches so that we can add them to the consolidator efficiently
       // Group by that unique identity mentioned above
@@ -77,6 +77,7 @@ class CorpusReader(
       _ = consolidator.add(pseudoIdentity, count, sentences)
       // return results
     } yield (foundBy, consolidator.getMatches)
+    consolidated.toMap
   }
 
   def getMatches(mentions: Seq[Mention]): Seq[Match] = {

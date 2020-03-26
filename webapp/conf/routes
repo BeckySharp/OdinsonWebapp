@@ -4,13 +4,8 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
-GET     /dev                        controllers.HomeController.dev
-GET     /hypernyms                  controllers.HomeController.getHypernyms(query: String)
-GET     /hyponyms                   controllers.HomeController.getHyponyms(query: String)
-GET     /cohyponyms                 controllers.HomeController.getCohyponyms(query: String)
-GET     /expandedHypernyms          controllers.HomeController.getExpandedHypernyms(query: String, n: Int = 5)
-GET     /customRules                controllers.HomeController.getCustomRuleResults(query: String, rules: String)
+GET     /                           controllers.HomeController.dev
+GET     /customRules                controllers.HomeController.getCustomRuleResults(rules: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
