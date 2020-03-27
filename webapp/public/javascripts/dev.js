@@ -2,7 +2,7 @@
 function format ( d ) {
 // `d` is the original data object for the row
     var t = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'
-    t = t + '<tr>' +
+    t = t + '<tr class="grey">' +
          '<td> DocID </td>' +
          '<td> Sentence Text </td>' +
         '</tr>';
@@ -86,6 +86,16 @@ function mkColumnDefs(arguments) {
 
 $(document).ready(function () {
 
+    var code = $(".codemirror-textarea")[0];
+    var editor = CodeMirror.fromTextArea(code, {
+        lineNumbers : true,
+        extraKeys: {
+                    "Tab": function(cm){
+                      cm.replaceSelection("   " , "end");
+                    }
+                   }
+    });
+
     $('form').submit(function (event) {
 
         // stop the form from submitting the normal way and refreshing the page
@@ -107,6 +117,7 @@ $(document).ready(function () {
             // to handle the fact that the thead remnants stay around:
             // ref: https://datatables.net/forums/discussion/20524/destroy-issue
             $('#results').empty();
+            $('#results').html('<caption id="tablecaption"></caption>');
         }
 
 

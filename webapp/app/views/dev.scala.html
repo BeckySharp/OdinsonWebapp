@@ -2,12 +2,18 @@
 <head>
     <title>Odinson Rule Development UI</title>
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
+<!--    DataTables has this css and the js in line 10 -->
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/jquery.dataTables.min.css"/>
     <!-- <link rel="stylesheet" type="text/css" href="assets/brat/static/style-vis.css"/> -->
     <!-- <script type="text/javascript" src="assets/brat/client/lib/head.load.min.js"></script> -->
     <script type="text/javascript" src="assets/javascripts/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="assets/javascripts/jquery.dataTables.min.js"></script>
+    <script src="assets/plugins/codemirror/lib/codemirror.js"></script>
+    <link rel="stylesheet" href="assets/plugins/codemirror/lib/codemirror.css">
+    <script src="assets/plugins/codemirror/mode/yaml/yaml.js"></script>
     <script type="text/javascript" src="assets/javascripts/dev.js"></script>
+
+
 </head>
 
 <body>
@@ -23,7 +29,7 @@
 <form>
 
     <label for="rules">Rules:</label>
-    <textarea id="rules" rows="10" cols="100">
+    <textarea id="rules" class="codemirror-textarea" rows="10" cols="100">
 vars:
   result: "(?<result> [tag=/J.*/]{,3} [tag=/N.*/]+ (of [tag=DT]? [tag=/J.*/]{,3} [tag=/N.*/]+)?)"
 

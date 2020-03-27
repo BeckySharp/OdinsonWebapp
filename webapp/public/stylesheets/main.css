@@ -4,7 +4,7 @@ body {
 }
 
 table {
-    margin-top: 30px;
+    margin-top: 5px;
     border-collapse: collapse;
 }
 
@@ -13,9 +13,14 @@ table, th,td {
     font-size: inherit;
 }
 
+th {
+  background-color: #1352B9;
+  color: white;
+}
+
 h1 {
     font-size: 150%;
-    color: #0C28C4;
+    color: #1352B9;
 }
 
 h2 {
@@ -59,10 +64,14 @@ tr.shown td.details-control {
     background: url('/assets/images/toggle.png') no-repeat center center;
 }
 caption {
-  text-align: left;
-  color: #0C28C4;
-  background: #D6DCFA ;
+  text-align: center;
+  color: #1352B9;
+  background: #C9D6EB ;
   font-size: 1.3em;
   margin-left: -1px; /* Fix FF 1px issue */
   padding: 5px;
+}
+
+tr.grey td {
+    background: #C9D6EB ;
 }
