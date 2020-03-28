@@ -11,6 +11,7 @@
     <script src="assets/plugins/codemirror/addon/edit/closebrackets.js"></script>
     <script src="assets/plugins/codemirror/addon/comment/comment.js"></script>
     <script src="assets/plugins/codemirror/mode/yaml-odinson/yaml-odinson.js"></script>
+<!--    <script src="assets/plugins/codemirror/mode/yaml/yaml.js"></script>-->
     <script type="text/javascript" src="assets/javascripts/dev.js"></script>
 
 
@@ -31,7 +32,7 @@
     <label for="rules">Rules:</label>
     <textarea id="rules" class="codemirror-textarea" rows="10" cols="100">
 vars:
-  chunk: "[tag=/J.*/]{,3} [tag=/N.*/]+ (of [tag=DT]? [tag=/J.*/]{,3} [tag=/N.*/]+)?"
+  chunk: "([tag=/J.*/]{,3} [tag=/N.*/]+ (of [tag=DT]? [tag=/J.*/]{,3} [tag=/N.*/]+)?)"
   variable: "(?<variable> [word = /[A-Z]{2,4}/])"
 
 rules:

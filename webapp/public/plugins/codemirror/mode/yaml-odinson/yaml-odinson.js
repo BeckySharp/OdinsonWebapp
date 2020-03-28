@@ -18,6 +18,8 @@ CodeMirror.defineMode("yaml", function() {
 
   return {
     token: function(stream, state) {
+      // consume space to handle indented comments -- hopefully ok...
+      stream.eatSpace();
       var ch = stream.peek();
       var esc = state.escaped;
       state.escaped = false;

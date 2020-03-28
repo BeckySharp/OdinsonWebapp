@@ -97,10 +97,16 @@ $(document).ready(function () {
                         cm.replaceSelection("   " , "end");
                     },
                     "Ctrl-/": function(cm){
-                        editor.execCommand('toggleComment');
+                        editor.toggleComment({
+                            indent: true
+                        });
+//                        editor.execCommand('toggleComment');
                     },
                     "Cmd-/": function(cm){
-                        editor.execCommand('toggleComment');
+                        editor.toggleComment({
+                            indent: true
+                        });
+//                        editor.execCommand('toggleComment');
                     }
                    }
     });
