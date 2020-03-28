@@ -31,13 +31,17 @@
     <label for="rules">Rules:</label>
     <textarea id="rules" class="codemirror-textarea" rows="10" cols="100">
 vars:
-  result: "(?<result> [tag=/J.*/]{,3} [tag=/N.*/]+ (of [tag=DT]? [tag=/J.*/]{,3} [tag=/N.*/]+)?)"
+  chunk: "[tag=/J.*/]{,3} [tag=/N.*/]+ (of [tag=DT]? [tag=/J.*/]{,3} [tag=/N.*/]+)?"
+  variable: "(?<variable> [word = /[A-Z]{2,4}/])"
 
 rules:
   - name: example-rule
-    type: basic   # or event
+    type: event
     pattern: |
-      (?<A> [] ) (?<B> [] ) (?<C> [] )    (?<init> issues)
+       trigger = represents
+       var = >nsubj ${variable}
+       def = >dobj ${chunk}
+
     </textarea>
     <br>
     <input type="submit">
