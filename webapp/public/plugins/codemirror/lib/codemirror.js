@@ -819,6 +819,12 @@
   StringStream.prototype.eol = function () {return this.pos >= this.string.length};
   StringStream.prototype.sol = function () {return this.pos == this.lineStart};
   StringStream.prototype.peek = function () {return this.string.charAt(this.pos) || undefined};
+  StringStream.prototype.peekCommentHash = function () {
+      var position = this.pos;
+      let start = position;
+      while (/[\s\u00a0]/.test(this.string.charAt(position))) ++position;
+      return this.string.charAt(position) == "#";
+    };
   StringStream.prototype.next = function () {
     if (this.pos < this.string.length)
       { return this.string.charAt(this.pos++) }

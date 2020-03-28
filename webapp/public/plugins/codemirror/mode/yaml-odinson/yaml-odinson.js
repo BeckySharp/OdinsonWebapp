@@ -19,12 +19,13 @@ CodeMirror.defineMode("yaml", function() {
   return {
     token: function(stream, state) {
       // consume space to handle indented comments -- hopefully ok...
-      stream.eatSpace();
+//      stream.eatSpace();
       var ch = stream.peek();
       var esc = state.escaped;
       state.escaped = false;
       /* comments */
-      if (ch == "#" && (stream.pos == 0 || /\s/.test(stream.string.charAt(stream.pos - 1)))) {
+//      if (ch == "#" && (stream.pos == 0 || /\s/.test(stream.string.charAt(stream.pos - 1)))) {
+      if (stream.peekCommentHash()) {
         stream.skipToEnd();
         return "comment";
       }
