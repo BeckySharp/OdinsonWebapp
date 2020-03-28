@@ -119,6 +119,8 @@
 
 .cm-s-default .cm-keyword {color: #708;}
 .cm-s-default .cm-atom {color: #219;}
+.cm-s-default .cm-atom-odinson {color: #1541F0;}
+.cm-s-default .cm-atom-odinson-2 {color: #09248E;}
 .cm-s-default .cm-number {color: #164;}
 .cm-s-default .cm-def {color: #00f;}
 .cm-s-default .cm-variable,
@@ -127,7 +129,10 @@
 .cm-s-default .cm-operator {}
 .cm-s-default .cm-variable-2 {color: #05a;}
 .cm-s-default .cm-variable-3, .cm-s-default .cm-type {color: #085;}
-.cm-s-default .cm-comment {color: #a50;}
+.cm-s-default .cm-variable-argname, .cm-s-default .cm-type {color: #7524F7;}
+.cm-s-default .cm-string-odinson, .cm-s-default .cm-type {color: #7E7D87;}
+.cm-s-default .cm-meta-odinson, .cm-s-default .cm-type {color: #945DF5;}
+.cm-s-default .cm-comment {color: #888787;}
 .cm-s-default .cm-string {color: #a11;}
 .cm-s-default .cm-string-2 {color: #f50;}
 .cm-s-default .cm-meta {color: #555;}

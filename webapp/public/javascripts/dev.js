@@ -89,9 +89,18 @@ $(document).ready(function () {
     var code = $(".codemirror-textarea")[0];
     var editor = CodeMirror.fromTextArea(code, {
         lineNumbers : true,
+        comment: true,
+        matchBrackets: true,
+        autoCloseBrackets: true,
         extraKeys: {
                     "Tab": function(cm){
-                      cm.replaceSelection("   " , "end");
+                        cm.replaceSelection("   " , "end");
+                    },
+                    "Ctrl-/": function(cm){
+                        editor.execCommand('toggleComment');
+                    },
+                    "Cmd-/": function(cm){
+                        editor.execCommand('toggleComment');
                     }
                    }
     });
