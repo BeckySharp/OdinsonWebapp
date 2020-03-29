@@ -7,14 +7,14 @@ import org.clulab.processors.fastnlp.FastNLPProcessor
 
 
 case class Match(
-  docId: Int,
+  docId: String,
   foundBy: String,
   namedCaptures: Array[NamedCapture],
   pseudoIdentity: Seq[NormalizedArg],
   evidence: Evidence,
 )
 
-case class Evidence(docID: Int, sentence: String)
+case class Evidence(docID: String, sentence: String)
 case class NormalizedArg(argName: String, normalizedTokens: Seq[String], originalTokens: Seq[String])
 
 
@@ -86,8 +86,9 @@ class CorpusReader(
       // Get the OdinsonMatch
       m = mention.odinsonMatch
       // Get the source for the extraction, store in wrapper class Evidence
-      docId = mention.luceneDocId
-      sentence = extractorEngine.getTokens(docId, extractorEngine.displayField).mkString(" ")
+      luceneDocID = mention.luceneDocId
+      docId = s"${mention.docId}_s${mention.sentenceId}"
+      sentence = extractorEngine.getTokens(luceneDocID, extractorEngine.displayField).mkString(" ")
       evidence = Evidence(docId, sentence)
       // Get the name of the rule that found the extraction
       foundBy = mention.foundBy
@@ -95,7 +96,7 @@ class CorpusReader(
       namedCaptures = m.namedCaptures
       // Do any normalizations and create a unique "name" that captures the names of and content
       // of all the arguments
-      pseudoIdentity = mkPseudoIdentity(docId, namedCaptures)
+      pseudoIdentity = mkPseudoIdentity(docId, luceneDocID, namedCaptures)
     } yield Match(docId, foundBy, namedCaptures, pseudoIdentity, evidence)
   }
 
@@ -114,12 +115,12 @@ class CorpusReader(
    * @param namedCaptures the named captures for the match
    * @return sequence of NormalizedArg -- the wrapper class for the views described above
    */
-  def mkPseudoIdentity(docId: Int, namedCaptures: Array[NamedCapture]): Seq[NormalizedArg] = {
+  def mkPseudoIdentity(docId: String, luceneDocID: Int, namedCaptures: Array[NamedCapture]): Seq[NormalizedArg] = {
     for {
       nc <- namedCaptures
       argName = nc.name
       capturedMatch = nc.capturedMatch
-      tokens = extractorEngine.getTokens(docId, capturedMatch).toSeq
+      tokens = extractorEngine.getTokens(luceneDocID, capturedMatch).toSeq
       normalizedTokens = if (consolidateByLemma) convertToLemmas(tokens) else tokens
     } yield NormalizedArg(argName, normalizedTokens, tokens)
   }
