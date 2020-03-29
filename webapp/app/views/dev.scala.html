@@ -37,11 +37,9 @@ vars:
 
 rules:
   - name: example-rule
-    type: event
+    type: basic
     pattern: |
-       trigger = represents
-       var = >nsubj ${variable}
-       def = >dobj ${chunk}
+       "covid-19" <nsubj (?<predicate> []) >dobj (?<theme> ${chunk})
 
     </textarea>
     <br>
