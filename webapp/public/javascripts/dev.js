@@ -163,6 +163,7 @@ $(document).ready(function () {
                 var ruleName = ruleData[2]
                 $('#tablecaption').text(ruleName);
                 $('#results').DataTable({
+                    colReorder: true,
                     destroy: true,
                     data: ruleRows,
                     // dynamically make the column headers to match the argument names
