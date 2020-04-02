@@ -132,6 +132,7 @@
 .cm-s-default .cm-variable-argname, .cm-s-default .cm-type {color: #7524F7;}
 .cm-s-default .cm-string-odinson, .cm-s-default .cm-type {color: #7E7D87;}
 .cm-s-default .cm-meta-odinson, .cm-s-default .cm-type {color: #945DF5;}
+.cm-s-default .cm-odinson-named-captures, .cm-s-default .cm-type {color: #555;}
 .cm-s-default .cm-comment {color: #888787;}
 .cm-s-default .cm-string {color: #a11;}
 .cm-s-default .cm-string-2 {color: #f50;}

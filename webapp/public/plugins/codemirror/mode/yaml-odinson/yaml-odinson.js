@@ -18,8 +18,6 @@ CodeMirror.defineMode("yaml", function() {
 
   return {
     token: function(stream, state) {
-      // consume space to handle indented comments -- hopefully ok...
-//      stream.eatSpace();
       var ch = stream.peek();
       var esc = state.escaped;
       state.escaped = false;
@@ -29,15 +27,21 @@ CodeMirror.defineMode("yaml", function() {
         stream.skipToEnd();
         return "comment";
       }
-
-      if (stream.match(/^('([^']|\\.)*'?|"([^"]|\\.)*"?)/))
+      if (stream.match(/^('([^']|\\.)*'?|"([^"]|\\.)*"?)/)) {
+        if (stream.match(/(\?\<\w+?\>)/)) { return 'variable-argname'; }
+//        stream.next();
         return "string";
-        // this is where we can add some more color for vars/rules
+      }
+
+      // this is where we can add some more color for vars/rules
       if (stream.match(/(vars|rules):/)) { return 'atom-odinson-2'; }
+      /* this is for the argnames that match */
+      if (stream.sol() && stream.match(/^\s*?(\s*?)(\w+?)(: ?\w+)?(\s*?)=\s*?/)) { return 'variable-argname'; }
+//      if (stream.match(/(\?\<\w+?\>)/)) { return 'odinson-named-captures'; }
       if (state.literal && stream.indentation() > state.keyCol) {
-        /* this is for the argnames that match */
-        if (stream.match(/.+\s?=\s*/)) { return 'variable-argname'; }
-        stream.skipToEnd(); return "string";
+        if (stream.match(/(\?\<\w+?\>)/)) { return 'variable-argname'; }
+        stream.next();
+        return "string";
       } else if (state.literal) { state.literal = false; }
       if (stream.sol()) {
         state.keyCol = 0;

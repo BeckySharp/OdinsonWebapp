@@ -41,7 +41,7 @@ rules:
   - name: example-rule
     type: basic
     pattern: |
-       "covid-19" <nsubj (?<predicate> []) >dobj (?<theme> ${chunk})
+       (?<cause> ${chunk}) <nsubj (?<trigger> [lemma=/cause|increase|decrease|affect/]) >dobj (?<effect> ${chunk})
 
     </textarea>
     <br>
