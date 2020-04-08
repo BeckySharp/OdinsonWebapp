@@ -1,3 +1,9 @@
+:root {
+  /*--odinson-dk-blue: #1352B9;*/
+  --odinson-dk-blue: #255497;
+}
+
+
 body {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 10pt;
@@ -14,17 +20,17 @@ table, th,td {
 }
 
 th {
-  background-color: #1352B9;
+  background-color: var(--odinson-dk-blue);
   color: white;
 }
 
 h1 {
     font-size: 150%;
-    color: #1352B9;
+    color: var(--odinson-dk-blue);
 }
 
 h2 {
-    font-size: 125%;
+    font-size: 110%;
     color: #2471A3;
 }
 
@@ -39,11 +45,11 @@ padding: 4px 18px 4px !important;
 font-size: 11px;
 background-color: #ffffff;
 font-weight: bold;
-color: #1352B9;
+color: var(--odinson-dk-blue);
 border-radius: 80px;
 -moz-border-radius: 80px;
 -webkit-border-radius: 80px;
-border: 1px solid #1352B9;
+border: 1px solid var(--odinson-dk-blue);
 cursor: pointer;
 outline: none;
 
@@ -51,7 +57,7 @@ outline: none;
 
 .submitbutton:hover
 {
-  background-color: #1352B9;
+  background-color: var(--odinson-dk-blue);
   color: #ffffff;
   transition-duration: 0.1s;
   box-shadow: 0 0 4pt 1pt #043D8F     inset;
@@ -94,7 +100,7 @@ tr.shown td.details-control {
 }
 caption {
   text-align: center;
-  color: #1352B9;
+  color: var(--odinson-dk-blue);
   background: #C9D6EB ;
   font-size: 1.3em;
   margin-left: -1px; /* Fix FF 1px issue */
@@ -114,7 +120,7 @@ tr.grey td {
 }
 
 .checkbox > span {
-    color: #1352B9;
+    color: var(--odinson-dk-blue);
     padding: 0.2rem 0.1rem;
 }
 
@@ -125,7 +131,7 @@ tr.grey td {
     -moz-appearance: none;
     -o-appearance: none;
     appearance: none;
-    border: 1px solid #1352B9;
+    border: 1px solid var(--odinson-dk-blue);
     border-radius: 50px;
     outline: none;
     transition-duration: 0.2s;
@@ -134,8 +140,8 @@ tr.grey td {
   }
 
 .checkbox > input:checked {
-    border: 1px solid #1352B9;
-    background-color: #1352B9;
+    border: 1px solid var(--odinson-dk-blue);
+    background-color: var(--odinson-dk-blue);
 }
 
 .checkbox > input:checked + span::before {
@@ -150,5 +156,5 @@ tr.grey td {
 }
 
 .checkbox > input:active {
-    border: 2px solid #1352B9;
+    border: 2px solid var(--odinson-dk-blue);
 }

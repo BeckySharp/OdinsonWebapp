@@ -39,7 +39,7 @@ function ruleDisplay (r) {
 function mkColumns(nArgs) {
     var columns = [];
     columns.push({
-         "className":      'details-control',
+         "className":      'details-control', // the evidence button
          "orderable":      false,
          "data":           null,
          "defaultContent": ''
