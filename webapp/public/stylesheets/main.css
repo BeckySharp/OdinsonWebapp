@@ -57,11 +57,11 @@ textarea {
 }
 
 td.details-control {
-    background: url('/assets/images/toggle_expand.png') no-repeat center center;
+    background: url('/assets/images/plus.svg') no-repeat center center;
     cursor: pointer;
 }
 tr.shown td.details-control {
-    background: url('/assets/images/toggle.png') no-repeat center center;
+    background: url('/assets/images/minus.svg') no-repeat center center;
 }
 caption {
   text-align: center;
