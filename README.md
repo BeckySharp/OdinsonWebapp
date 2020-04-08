@@ -37,6 +37,6 @@ The matches will be saved as a json lines file (i.e., one json object per match,
 The file will be saved in the current directory, in a file named by the rule name concatenated
 with the local datetime (e.g., `example-rule_2020-04-08_10:47:36.jsonl`).
 
-![image](docs/images/evidence.png)
+![image](docs/images/export.png)
 
 Any feedback is much appreciated!
