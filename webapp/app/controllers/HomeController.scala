@@ -41,9 +41,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def getCustomRuleResults(rules: String, exportMatches: Boolean) = Action {
     // println(s"[DEV] Query: <<$query>>\tRULE: <<$rule>>")
     val matches = reader.extractMatches(rules)
-    println(exportMatches)
     if (exportMatches) {
-      println("EXPORTING!")
       // fixme
       val localDateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss")
       val outfile = s"${ruleNameHack(rules)}_${localDateFormat.format(new Date)}.jsonl"
