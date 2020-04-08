@@ -6,6 +6,7 @@ Odinson is a highly optimized information extraction framework that
 supports *real-time* queries against an indexed corpus.
 For more information, please see [Odinson's documentaion](https://github.com/lum-ai/odinson).
 
+
 To use this webapp, I assume you already have an [Odinson index made](https://github.com/lum-ai/odinson/tree/master/extra).
 
  - Point the webapp to the index.  In `src/main/resources/application.conf` 
