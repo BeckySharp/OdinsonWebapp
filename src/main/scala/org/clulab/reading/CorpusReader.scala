@@ -1,22 +1,29 @@
 package org.clulab.reading
 
+import java.io.PrintWriter
+
 import ai.lum.common.ConfigUtils._
 import ai.lum.common.ConfigFactory
 import ai.lum.odinson._
 import org.clulab.processors.fastnlp.FastNLPProcessor
-
+import ujson.Value
+import upickle.default._
+import upickle.default.{macroRW, ReadWriter => RW}
 
 case class Match(
   docId: String,
   foundBy: String,
-  namedCaptures: Array[NamedCapture],
+//  namedCaptures: Array[NamedCapture],
   pseudoIdentity: Seq[NormalizedArg],
   evidence: Evidence,
 )
+object Match {implicit val rw: RW[Match] = macroRW}
 
 case class Evidence(docID: String, sentence: String)
-case class NormalizedArg(argName: String, normalizedTokens: Seq[String], originalTokens: Seq[String])
+object Evidence {implicit val rw: RW[Evidence] = macroRW}
 
+case class NormalizedArg(argName: String, normalizedTokens: Seq[String], originalTokens: Seq[String])
+object NormalizedArg {implicit val rw: RW[NormalizedArg] = macroRW}
 
 object CorpusReader {
   def fromConfig: CorpusReader = {
@@ -25,6 +32,22 @@ object CorpusReader {
     val numEvidenceDisplay = config.get[Int]("ui.numEvidenceDisplay").getOrElse(3)
     val consolidateByLemma = config.get[Boolean]("ui.lemmaConsolidation").getOrElse(true)
     new CorpusReader(extractorEngine, numEvidenceDisplay, consolidateByLemma)
+  }
+
+  /**
+   * Write the matches to a file as json lines format, where each line is a valid json object
+   * @param ms matches to write
+   * @param filename where to write the file
+   */
+  def writeMatchesTo(ms: Seq[Match], filename: String): Unit = {
+    println(s"writing ${ms.length} matches to $filename")
+    val pw = new PrintWriter(filename: String)
+    ms.foreach { m =>
+      writeTo(m, pw)
+      pw.println()
+    }
+    pw.flush()
+    pw.close()
   }
 }
 
@@ -43,22 +66,29 @@ class CorpusReader(
    * @param rules
    * @return Map[ruleName, consolidated extractions for that rule]
    */
-  def getExtractions(rules: String): Map[String, Seq[ConsolidatedMatch]] = {
+  def extractMatches(rules: String): Seq[Match] = {
     val extractors = mkExtractorsFromRules(rules)
-    val consolidatedMatches = getMatches(extractors)
-    consolidatedMatches.mapValues(rankMatches)
+    extractMatches(extractors)
   }
 
   /**
-   * Apply extractors to corpus, consolidate results by rule and return the consolidated Matches, persisting
-   * all evidence for downstream users.
+   * Apply extractors to corpus to get the matches
    * @param extractors
-   * @return Map with consolidated matches (i.e., "deduplicated") for each rule (key)
+   * @return sequence of Match
    */
-  def getMatches(extractors: Seq[Extractor]): Map[String, Seq[ConsolidatedMatch]] = {
+  def extractMatches(extractors: Seq[Extractor]): Seq[Match] = {
     val mentions = extractorEngine.extractMentions(extractors)
     // Convert the mentions into our Match objects
-    val matches = getMatches(mentions)
+    getMatches(mentions)
+  }
+
+  /**
+   * Consolidate results by rule and return the consolidated Matches, persisting
+   * all evidence for downstream users.
+   * @param matches
+   * @return Map with consolidated matches (i.e., "deduplicated") for each rule (key)
+   */
+  def consolidateMatches(matches: Seq[Match]): Map[String, Seq[ConsolidatedMatch]] = {
     // Each rule may have different args and different numbers of args, so we'll need to display
     // them separately.
     val groupByRule = matches.groupBy(_.foundBy).toSeq
@@ -77,7 +107,10 @@ class CorpusReader(
       _ = consolidator.add(pseudoIdentity, count, sentences)
       // return results
     } yield (foundBy, consolidator.getMatches)
-    consolidated.toMap
+    // Rank the consolidated matches
+    consolidated
+      .toMap
+      .mapValues(rankMatches)
   }
 
   def getMatches(mentions: Seq[Mention]): Seq[Match] = {
@@ -97,7 +130,7 @@ class CorpusReader(
       // Do any normalizations and create a unique "name" that captures the names of and content
       // of all the arguments
       pseudoIdentity = mkPseudoIdentity(docId, luceneDocID, namedCaptures)
-    } yield Match(docId, foundBy, namedCaptures, pseudoIdentity, evidence)
+    } yield Match(docId, foundBy, pseudoIdentity, evidence)
   }
 
   def rankMatches(matches: Seq[ConsolidatedMatch]): Seq[ConsolidatedMatch] = {

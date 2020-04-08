@@ -39,7 +39,7 @@ function ruleDisplay (r) {
 function mkColumns(nArgs) {
     var columns = [];
     columns.push({
-         "className":      'details-control',
+         "className":      'details-control', // the evidence button
          "orderable":      false,
          "data":           null,
          "defaultContent": ''
@@ -119,7 +119,8 @@ $(document).ready(function () {
         // collect form data
         var rules = $('#rules').val();
         var formData = {
-            'rules': rules
+            'rules': rules,
+            'export': $('input[name=export]').is(':checked')
         }
 
         if (!formData.rules.trim()) {

@@ -1,0 +1,44 @@
+<html>
+<head>
+    <title>Odinson Rule Development UI</title>
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" href="assets/plugins/DataTables/colReorder.css">
+    <script type="text/javascript" src="assets/javascripts/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="assets/javascripts/jquery.dataTables.min.js"></script>
+    <script src="assets/plugins/DataTables/colReorder.js"></script>
+    <script type="text/javascript" src="assets/javascripts/dev.js"></script>
+
+
+</head>
+
+<body>
+<h1>Odinson Rule Development Simple UI</h1>
+<!--new rule-->
+
+<!--3 panes-->
+<div id="overlay">
+    <div id="loading">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="assets/images/loading.svg"><br />
+        Reading text...
+    </div>
+</div>
+
+<form>
+
+    <label for="rules">Rules:</label>
+    <textarea id="rules" class="codemirror-textarea" rows="10" cols="100">
+        ... change to something else ...
+        .. add panes
+    </textarea>
+    <br>
+    <input type="submit">
+</form>
+
+<!--extractions table at the bottom-->
+<table id="results" class="display" width="100%">
+    <caption id="tablecaption"></caption>
+</table>
+
+</body>
+</html>
