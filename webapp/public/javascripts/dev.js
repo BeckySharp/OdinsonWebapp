@@ -119,7 +119,8 @@ $(document).ready(function () {
         // collect form data
         var rules = $('#rules').val();
         var formData = {
-            'rules': rules
+            'rules': rules,
+            'export': $('input[name=export]').is(':checked')
         }
 
         if (!formData.rules.trim()) {

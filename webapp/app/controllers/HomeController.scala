@@ -35,9 +35,13 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     Ok(views.html.dev())
   }
 
-  def getCustomRuleResults(rules: String) = Action {
+  def getCustomRuleResults(rules: String, exportMatches: Boolean) = Action {
     // println(s"[DEV] Query: <<$query>>\tRULE: <<$rule>>")
-    val resultsByRule = reader.getExtractions(rules)
+    val matches = reader.extractMatches(rules)
+    if (exportMatches) {
+      println("EXPORT MATCHES")
+    }
+    val resultsByRule = reader.consolidateMatches(matches)
     println(s"num results: ${resultsByRule.toSeq.flatMap(_._2).length}")
     val json = JsonUtils.mkJsonDict(resultsByRule)
     println(Json.prettyPrint(json))

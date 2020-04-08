@@ -43,22 +43,29 @@ class CorpusReader(
    * @param rules
    * @return Map[ruleName, consolidated extractions for that rule]
    */
-  def getExtractions(rules: String): Map[String, Seq[ConsolidatedMatch]] = {
+  def extractMatches(rules: String): Seq[Match] = {
     val extractors = mkExtractorsFromRules(rules)
-    val consolidatedMatches = getMatches(extractors)
-    consolidatedMatches.mapValues(rankMatches)
+    extractMatches(extractors)
   }
 
   /**
-   * Apply extractors to corpus, consolidate results by rule and return the consolidated Matches, persisting
-   * all evidence for downstream users.
+   * Apply extractors to corpus to get the matches
    * @param extractors
-   * @return Map with consolidated matches (i.e., "deduplicated") for each rule (key)
+   * @return sequence of Match
    */
-  def getMatches(extractors: Seq[Extractor]): Map[String, Seq[ConsolidatedMatch]] = {
+  def extractMatches(extractors: Seq[Extractor]): Seq[Match] = {
     val mentions = extractorEngine.extractMentions(extractors)
     // Convert the mentions into our Match objects
-    val matches = getMatches(mentions)
+    getMatches(mentions)
+  }
+
+  /**
+   * Consolidate results by rule and return the consolidated Matches, persisting
+   * all evidence for downstream users.
+   * @param matches
+   * @return Map with consolidated matches (i.e., "deduplicated") for each rule (key)
+   */
+  def consolidateMatches(matches: Seq[Match]): Map[String, Seq[ConsolidatedMatch]] = {
     // Each rule may have different args and different numbers of args, so we'll need to display
     // them separately.
     val groupByRule = matches.groupBy(_.foundBy).toSeq
@@ -77,7 +84,10 @@ class CorpusReader(
       _ = consolidator.add(pseudoIdentity, count, sentences)
       // return results
     } yield (foundBy, consolidator.getMatches)
-    consolidated.toMap
+    // Rank the consolidated matches
+    consolidated
+      .toMap
+      .mapValues(rankMatches)
   }
 
   def getMatches(mentions: Seq[Mention]): Seq[Match] = {
