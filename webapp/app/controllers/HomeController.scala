@@ -46,7 +46,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
       println("EXPORTING!")
       // fixme
       val localDateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss")
-      val outfile = s"${ruleNameHack(rules)}_${localDateFormat.format(new Date)}.json"
+      val outfile = s"${ruleNameHack(rules)}_${localDateFormat.format(new Date)}.jsonl"
       CorpusReader.writeMatchesTo(matches, outfile)
     }
     val resultsByRule = reader.consolidateMatches(matches)

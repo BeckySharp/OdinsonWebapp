@@ -120,7 +120,7 @@ class CorpusReader(
       m = mention.odinsonMatch
       // Get the source for the extraction, store in wrapper class Evidence
       luceneDocID = mention.luceneDocId
-      docId = s"${mention.docId}_s${mention.sentenceId}"
+      docId = s"${mention.docId}:${mention.sentenceId}"
       sentence = extractorEngine.getTokens(luceneDocID, extractorEngine.displayField).mkString(" ")
       evidence = Evidence(docId, sentence)
       // Get the name of the rule that found the extraction
