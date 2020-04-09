@@ -113,7 +113,7 @@ class CorpusReader(
       .mapValues(rankMatches)
   }
 
-  def getMatches(mentions: Seq[Mention]): Seq[Match] = {
+  private def getMatches(mentions: Seq[Mention]): Seq[Match] = {
     for {
       mention <- mentions
       // Get the OdinsonMatch
@@ -126,18 +126,25 @@ class CorpusReader(
       // Get the name of the rule that found the extraction
       foundBy = mention.foundBy
       // Get the results of the rule
-      namedCaptures = m.namedCaptures
+      namedCaptures = m.namedCaptures ++ triggerNamedCaptureOpt(m).toSeq
       // Do any normalizations and create a unique "name" that captures the names of and content
       // of all the arguments
       pseudoIdentity = mkPseudoIdentity(docId, luceneDocID, namedCaptures)
     } yield Match(docId, foundBy, pseudoIdentity, evidence)
   }
 
-  def rankMatches(matches: Seq[ConsolidatedMatch]): Seq[ConsolidatedMatch] = {
+  private def triggerNamedCaptureOpt(m: OdinsonMatch): Option[NamedCapture] = {
+    m match {
+      case em: EventMatch => Some(NamedCapture("trigger", None, em.trigger))
+      case _ => None
+    }
+  }
+
+  private def rankMatches(matches: Seq[ConsolidatedMatch]): Seq[ConsolidatedMatch] = {
     matches.sortBy(-_.count)
   }
 
-  def mkExtractorsFromRules(rules: String): Seq[Extractor] = {
+  private def mkExtractorsFromRules(rules: String): Seq[Extractor] = {
     extractorEngine.ruleReader.compileRuleFile(rules.mkString)
   }
 
@@ -148,7 +155,7 @@ class CorpusReader(
    * @param namedCaptures the named captures for the match
    * @return sequence of NormalizedArg -- the wrapper class for the views described above
    */
-  def mkPseudoIdentity(docId: String, luceneDocID: Int, namedCaptures: Array[NamedCapture]): Seq[NormalizedArg] = {
+  private def mkPseudoIdentity(docId: String, luceneDocID: Int, namedCaptures: Array[NamedCapture]): Seq[NormalizedArg] = {
     for {
       nc <- namedCaptures
       argName = nc.name
@@ -158,7 +165,7 @@ class CorpusReader(
     } yield NormalizedArg(argName, normalizedTokens, tokens)
   }
 
-  def convertToLemmas(words: Seq[String]): Seq[String] = {
+  private def convertToLemmas(words: Seq[String]): Seq[String] = {
     val s = words.mkString(" ")
     val doc = proc.mkDocument(s)
     proc.tagPartsOfSpeech(doc)
