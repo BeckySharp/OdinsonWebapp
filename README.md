@@ -9,7 +9,7 @@ For more information, please see [Odinson's documentaion](https://github.com/lum
 
 To use this webapp, I assume you already have an [Odinson index made](https://github.com/lum-ai/odinson/tree/master/extra).
 
- - Point the webapp to the index.  In `src/main/resources/application.conf` 
+ - Point the webapp to the index (not the parent dir).  In `src/main/resources/application.conf` 
  set: 
     
         odinson.indexDir = "path/to/index"
