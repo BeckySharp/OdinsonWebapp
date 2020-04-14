@@ -16,7 +16,7 @@ object JsonUtils {
     val argNames = getArgNames(results)
     Json.obj(
       "rule"  -> rule,
-      "arguments" -> Json.arr(argNames),
+      "args" -> Json.arr(argNames),
       // put the results in the same order as the argNames above to pop into the table
       "results" -> results.map(r => mkJsonConsolidatedMatch(r, argNames))
     )

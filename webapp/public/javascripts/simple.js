@@ -1,3 +1,88 @@
+/* Formatting function for row details - here the evidence */
+function format ( d ) {
+// `d` is the original data object for the row
+    var t = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'
+    t = t + '<tr class="grey">' +
+         '<td> DocID </td>' +
+         '<td> Sentence Text </td>' +
+        '</tr>';
+    for (let i = 0; i < d.evidence.length; i++) {
+        t = t + '<tr>' +
+                 '<td>' + d.evidence[i].id + '</td>' +
+                 '<td>' + d.evidence[i].sentence + '</td>' +
+                '</tr>';
+    }
+    return t + '</table>';
+}
+
+function ruleDisplay (r) {
+    var rule = r.rule
+    var arguments = r.arguments[0];
+    var data = []
+    var results = r.results
+    for (let i = 0; i < results.length; i ++) {
+        cells = {}
+        var curr = results[i]
+        for (let j = 0; j < arguments.length; j ++) {
+            var jString = j.toString()
+            cells[jString] = curr.result[0][j]
+        }
+        cells["count"] = curr.count
+        cells["evidence"] = curr.evidence
+        data.push(cells)
+    }
+
+    return [arguments, data, rule];
+
+}
+
+function mkColumns(nArgs) {
+    var columns = [];
+    columns.push({
+         "className":      'details-control', // the evidence button
+         "orderable":      false,
+         "data":           null,
+         "defaultContent": ''
+     });
+    for (let i = 0; i < nArgs; i ++) {
+       var cell = {};
+       cell.data = i.toString();
+       columns.push(cell);
+    }
+    columns.push({data: "count"})
+    return columns;
+}
+
+function mkColumnDefs(arguments) {
+    var columnDefs = [];
+
+    // The expand/collapse column
+    var firstCol = {};
+    firstCol.targets = 0;
+    firstCol.className ="dt-center";
+    firstCol.width = "5px";
+    columnDefs.push(firstCol);
+
+    // Argument columns
+    for (let i = 0; i < arguments.length; i++) {
+       var cell = {};
+       cell.targets = i+1;
+       cell.title = arguments[i]
+       columnDefs.push(cell);
+    }
+
+    // Count column
+    var cell = {};
+    cell.targets = arguments.length + 1;
+    cell.title = "count";
+    cell.className ="dt-center";
+    cell.width = "30px";
+    columnDefs.push(cell);
+
+    return columnDefs;
+}
+
+
 
 $(document).ready(function () {
 
@@ -15,11 +100,13 @@ $(document).ready(function () {
                         editor.toggleComment({
                             indent: true
                         });
+//                        editor.execCommand('toggleComment');
                     },
                     "Cmd-/": function(cm){
                         editor.toggleComment({
                             indent: true
                         });
+//                        editor.execCommand('toggleComment');
                     }
                    }
     });
@@ -49,6 +136,7 @@ $(document).ready(function () {
             $('#results').html('<caption id="tablecaption"></caption>');
         }
 
+
         // show spinner
         document.getElementById("overlay").style.display = "block";
 
@@ -70,8 +158,8 @@ $(document).ready(function () {
         .done(function (data) {
             for (let i = 0; i < data.length; i++) {
                 var ruleData = ruleDisplay(data[i])
-                var args = ruleData[0]
-                var nArgs = args.length
+                var arguments = ruleData[0]
+                var nArgs = arguments.length
                 var ruleRows = ruleData[1]
                 var ruleName = ruleData[2]
                 $('#tablecaption').text(ruleName);
@@ -80,7 +168,7 @@ $(document).ready(function () {
                     destroy: true,
                     data: ruleRows,
                     // dynamically make the column headers to match the argument names
-                    columnDefs: mkColumnDefs(args),
+                    columnDefs: mkColumnDefs(arguments),
                     // dynamically make the columns with data for this rule
                     columns: mkColumns(nArgs),
                     });
@@ -110,95 +198,3 @@ $(document).ready(function () {
     } );
 
 });
-
-// --------------------------------------------------------------------------------------------------------
-//                                      TABLE FORMATTING METHODS
-// --------------------------------------------------------------------------------------------------------
-
-
-/* Formatting function for row details - here the evidence */
-function format ( d ) {
-// `d` is the original data object for the row
-    var t = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'
-    t = t + '<tr class="grey">' +
-         '<td> DocID </td>' +
-         '<td> Sentence Text </td>' +
-        '</tr>';
-    for (let i = 0; i < d.evidence.length; i++) {
-        t = t + '<tr>' +
-                 '<td>' + d.evidence[i].id + '</td>' +
-                 '<td>' + d.evidence[i].sentence + '</td>' +
-                '</tr>';
-    }
-    return t + '</table>';
-}
-
-// processing the results into the format we need
-function ruleDisplay (r) {
-    var rule = r.rule;
-    var args = r.args[0];
-    var data = [];
-    var results = r.results;
-    for (let i = 0; i < results.length; i ++) {
-        cells = {};
-        var curr = results[i];
-        for (let j = 0; j < args.length; j ++) {
-            var jString = j.toString();
-            cells[jString] = curr.result[0][j];
-        }
-        cells["count"] = curr.count;
-        cells["evidence"] = curr.evidence;
-        data.push(cells);
-    }
-
-    return [args, data, rule];
-
-}
-
-// formatting the data point into a row in the table
-function mkColumns(nArgs) {
-    var columns = [];
-    columns.push({
-         "className":      'details-control', // the evidence button
-         "orderable":      false,
-         "data":           null,
-         "defaultContent": ''
-     });
-    for (let i = 0; i < nArgs; i ++) {
-       var cell = {};
-       cell.data = i.toString();
-       columns.push(cell);
-    }
-    columns.push({data: "count"})
-    return columns;
-}
-
-// Making the table headers (dynamically)
-function mkColumnDefs(args) {
-    var columnDefs = [];
-
-    // The expand/collapse column
-    var firstCol = {};
-    firstCol.targets = 0;
-    firstCol.className ="dt-center";
-    firstCol.width = "5px";
-    columnDefs.push(firstCol);
-
-    // Argument columns
-    for (let i = 0; i < args.length; i++) {
-       var cell = {};
-       cell.targets = i+1;
-       cell.title = args[i]
-       columnDefs.push(cell);
-    }
-
-    // Count column
-    var cell = {};
-    cell.targets = args.length + 1;
-    cell.title = "count";
-    cell.className ="dt-center";
-    cell.width = "30px";
-    columnDefs.push(cell);
-
-    return columnDefs;
-}
