@@ -17,13 +17,13 @@ function format ( d ) {
 
 function ruleDisplay (r) {
     var rule = r.rule
-    var arguments = r.arguments[0];
+    var args = r.args[0];
     var data = []
     var results = r.results
     for (let i = 0; i < results.length; i ++) {
         cells = {}
         var curr = results[i]
-        for (let j = 0; j < arguments.length; j ++) {
+        for (let j = 0; j < args.length; j ++) {
             var jString = j.toString()
             cells[jString] = curr.result[0][j]
         }
@@ -32,7 +32,7 @@ function ruleDisplay (r) {
         data.push(cells)
     }
 
-    return [arguments, data, rule];
+    return [args, data, rule];
 
 }
 
@@ -53,7 +53,7 @@ function mkColumns(nArgs) {
     return columns;
 }
 
-function mkColumnDefs(arguments) {
+function mkColumnDefs(args) {
     var columnDefs = [];
 
     // The expand/collapse column
@@ -64,16 +64,16 @@ function mkColumnDefs(arguments) {
     columnDefs.push(firstCol);
 
     // Argument columns
-    for (let i = 0; i < arguments.length; i++) {
+    for (let i = 0; i < args.length; i++) {
        var cell = {};
        cell.targets = i+1;
-       cell.title = arguments[i]
+       cell.title = args[i]
        columnDefs.push(cell);
     }
 
     // Count column
     var cell = {};
-    cell.targets = arguments.length + 1;
+    cell.targets = args.length + 1;
     cell.title = "count";
     cell.className ="dt-center";
     cell.width = "30px";
@@ -158,8 +158,8 @@ $(document).ready(function () {
         .done(function (data) {
             for (let i = 0; i < data.length; i++) {
                 var ruleData = ruleDisplay(data[i])
-                var arguments = ruleData[0]
-                var nArgs = arguments.length
+                var args = ruleData[0]
+                var nArgs = args.length
                 var ruleRows = ruleData[1]
                 var ruleName = ruleData[2]
                 $('#tablecaption').text(ruleName);
@@ -168,7 +168,7 @@ $(document).ready(function () {
                     destroy: true,
                     data: ruleRows,
                     // dynamically make the column headers to match the argument names
-                    columnDefs: mkColumnDefs(arguments),
+                    columnDefs: mkColumnDefs(args),
                     // dynamically make the columns with data for this rule
                     columns: mkColumns(nArgs),
                     });
