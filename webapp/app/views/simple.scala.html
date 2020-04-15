@@ -25,18 +25,59 @@
 </div>
 
 <form>
+    <h2>Develop Rule:</h2>
+    <p> rule name: <input type="text" value="example-rule"> </p>
+    <table class="svo">
+        <tr class="pad-top">
+            <th> </th>
+            <th> <p> Label </p> </th>
+            <th> <p> Word(s) </p> </th>
+            <th> req </th>
+            <th> opt </th>
+        </tr>
+        <tr class="pad">
+            <th > subject </th>
+            <th> <p> <input type="text" value="subject"> </p> </th>
+            <th> <p> <input type="text" value=""> </p> </th>
+            <th>
+                <input type="radio" value="required" name="subj_radio" checked>
+            </th>
+            <th>
+                <input type="radio" value="optional" name="subj_radio">
+            </th>
+        </tr>
+        <tr class="pad">
+            <th> verb </th>
+            <th> <p> <input type="text" value="verb"> </p> </th>
+            <th> <p> <input type="text" value=""> </p> </th>
+            <th>
+                <input type="radio" value="required" name="v_radio" checked>
+            </th>
+            <th>
+                <input type="radio" value="optional" name="v_radio">
+            </th>
+        </tr>
+        <tr class="pad">
+            <th> object </th>
+            <th> <p> <input type="text" value="object"> </p> </th>
+            <th> <p> <input type="text" value=""> </p> </th>
+            <th>
+                <input type="radio" value="required" name="obj_radio" checked>
+            </th>
+            <th>
+                <input type="radio" value="optional" name="obj_radio">
+            </th>
+        </tr>
+    </table>
 
-    <label for="rules">Rules:</label>
-    <textarea id="rules" class="codemirror-textarea" rows="10" cols="100">
-        ... change to something else ...
-        .. add panes
-    </textarea>
+
+
     <br>
-    <input type="submit">
+    <input class="submitbutton" type="submit" value="SUBMIT">
 </form>
 
 <!--extractions table at the bottom-->
-<table id="results" class="display" width="100%">
+<table id="results" class="display svo" width="100%">
     <caption id="tablecaption"></caption>
 </table>
 

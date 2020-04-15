@@ -38,6 +38,10 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     Ok(views.html.dev())
   }
 
+  def simple() = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.simple())
+  }
+
   def getCustomRuleResults(rules: String, exportMatches: Boolean) = Action {
     // println(s"[DEV] Query: <<$query>>\tRULE: <<$rule>>")
     val matches = reader.extractMatches(rules)

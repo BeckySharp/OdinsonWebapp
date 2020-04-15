@@ -1,6 +1,8 @@
 :root {
   /*--odinson-dk-blue: #1352B9;*/
   --odinson-dk-blue: #255497;
+  --odinson-lt-gray: #DFDFDF;
+  --odinson-hover-blue: #DBE2EC;
 }
 
 
@@ -19,9 +21,42 @@ table, th,td {
     font-size: inherit;
 }
 
-th {
+table.svo {
+    border: 0px solid black;
+    font-size: inherit;
+}
+
+
+.display th {
   background-color: var(--odinson-dk-blue);
   color: white;
+}
+
+.svo th {
+    border: 0px solid black;
+    font-weight: normal;
+}
+
+.svo .pad th {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    padding-bottom: 10pt;
+}
+
+.pad-top th {
+    padding-top: 10pt;
+}
+
+.svo input {
+    border: 1px solid var(--odinson-lt-gray);
+    border-radius: 10px;
+    padding: 2px;
+    text-align: center;
+    background-color: #F2F3F5;
+}
+
+.svo input:hover{
+    background-color: var(--odinson-hover-blue);
 }
 
 h1 {
@@ -98,7 +133,7 @@ td.details-control {
 tr.shown td.details-control {
     background: url('/assets/images/minus.svg') no-repeat center center;
 }
-caption {
+.dev caption {
   text-align: center;
   color: var(--odinson-dk-blue);
   background: #C9D6EB ;
