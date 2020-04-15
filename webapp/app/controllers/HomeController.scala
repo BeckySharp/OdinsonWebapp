@@ -5,10 +5,9 @@ import java.util.Date
 
 import javax.inject._
 import org.clulab.reading.{CorpusReader, Match}
+import play.api.libs.json._
 import play.api.mvc._
 
-import scala.util.matching.Regex
-import scala.collection.mutable
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -30,9 +29,6 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
    * will be called when the application receives a `GET` request with
    * a path of `/`.
    */
-//  def index() = Action { implicit request: Request[AnyContent] =>
-//    Ok(views.html.index())
-//  }
 
   def dev() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.dev())
@@ -62,6 +58,18 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val namePattern = """name:\s*([^\s\\]+)""".r
     val m = namePattern.findFirstMatchIn(rules)
     m.get.group(1)
+  }
+
+  def buildRules(data:String) = Action {
+    println(data)
+    val j = Json.parse(data)
+    val ruleName = j("ruleName")
+    val subj = j("subj")
+    val verb = j("verb")
+    val obj = j("obj")
+
+    val output = Json.toJson("")
+    Ok(output)
   }
 
 }

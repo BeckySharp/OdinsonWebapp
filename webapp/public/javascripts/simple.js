@@ -1,45 +1,54 @@
 
 $(document).ready(function () {
 
-    var code = $(".codemirror-textarea")[0];
-    var editor = CodeMirror.fromTextArea(code, {
-        lineNumbers : true,
-        comment: true,
-        matchBrackets: true,
-        autoCloseBrackets: true,
-        extraKeys: {
-                    "Tab": function(cm){
-                        cm.replaceSelection("   " , "end");
-                    },
-                    "Ctrl-/": function(cm){
-                        editor.toggleComment({
-                            indent: true
-                        });
-                    },
-                    "Cmd-/": function(cm){
-                        editor.toggleComment({
-                            indent: true
-                        });
-                    }
-                   }
-    });
-
+    var form = $("#svoForm");
     $('form').submit(function (event) {
 
         // stop the form from submitting the normal way and refreshing the page
         event.preventDefault();
 
         // collect form data
-        var rules = $('#rules').val();
-        var formData = {
-            'rules': rules,
-            'export': $('input[name=export]').is(':checked')
-        }
+        var ruleName = $('#rulename').val();
 
-        if (!formData.rules.trim()) {
-            alert("Please write something.");
-            return;
-        }
+        // Subject
+        var subjectData = Object();
+        // Label or default placeholder
+        subjectData.label = $('#sLabel').val();
+        if (!subjectData.label.trim()) {
+            subjectData.label = document.getElementById("sLabel").placeholder;
+        };
+        subjectData.words = $('#sWords').val();
+        subjectData.argType = form.find("input[name=subj_radio]:checked").val();
+
+        // Verb
+        var verbData = Object();
+        // Label or default placeholder
+        verbData.label = $('#vLabel').val();
+        if (!verbData.label.trim()) {
+            verbData.label = document.getElementById("vLabel").placeholder;
+        };
+        verbData.words = $('#vWords').val();
+        verbData.argType = form.find("input[name=verb_radio]:checked").val();
+
+        // Object
+        var objectData = Object();
+        // Label or default placeholder
+        objectData.label = $('#oLabel').val();
+        if (!objectData.label.trim()) {
+            objectData.label = document.getElementById("oLabel").placeholder;
+        };
+        objectData.words = $('#oWords').val();
+        objectData.argType = form.find("input[name=obj_radio]:checked").val();
+
+        var data = Object();
+        data.ruleName = $('#rulename').val();
+        data.subj = subjectData;
+        data.verb = verbData;
+        data.obj = objectData;
+
+        var formData = {
+            "data": JSON.stringify(data)
+        };
 
         if ($.fn.DataTable.isDataTable('#results')) {
             $('#results').DataTable().clear().destroy();
@@ -55,7 +64,7 @@ $(document).ready(function () {
         // process the form
         $.ajax({
             type: 'GET',
-            url: 'customRules',
+            url: 'buildRules',
             data: formData,
             dataType: 'json',
             encode: true
