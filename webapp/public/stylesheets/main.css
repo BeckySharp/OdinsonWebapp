@@ -32,19 +32,21 @@ table.svo {
   color: white;
 }
 
-.svo th {
+.svo td,th {
     border: 0px solid black;
     font-weight: normal;
 }
 
-.svo .pad th {
+.svo .pad td {
     padding-left: 10pt;
     padding-right: 10pt;
     padding-bottom: 10pt;
 }
 
+
 .pad-top th {
     padding-top: 10pt;
+    text-align: center;
 }
 
 .svo input {
@@ -54,6 +56,7 @@ table.svo {
     text-align: center;
     background-color: #F2F3F5;
 }
+
 
 .svo input:hover{
     background-color: var(--odinson-hover-blue);
@@ -204,16 +207,28 @@ tr.grey td {
 }
 
 .container .row {
-    min-height: 100px;
+        overflow: auto;
 }
 
 
-.container .col {
+.container-fluid .outlined {
     border: 2px solid var(--odinson-dk-blue);
-    min-height: 100px;
+    overflow: auto;
 }
 
-.container .col-8 {
-    border: 2px solid var(--odinson-dk-blue);
-    min-height: 200px;
+.container-fluid .col-8 {
+    border: 1px solid var(--odinson-dk-blue);
+    overflow: auto;
 }
+
+.resizable {
+    resize: vertical;
+    overflow: auto;ß
+ }
+
+ .flex-fill {
+     flex: 1 1 auto;
+ }
+
+ .full-height {height: 100%;}
+ .half-height {height: 50%;}

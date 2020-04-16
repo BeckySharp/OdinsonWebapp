@@ -134,6 +134,7 @@ $(window).on("load", function () {
     // -----------------------------------------------
     //           Form for adding modification
     // -----------------------------------------------
+    var nMods = 0;
     var modForm = $("#modifierForm");
     modForm.submit(function (event) {
 
@@ -142,35 +143,117 @@ $(window).on("load", function () {
 
             // Get search term
             var searchTerm = $('#searchTerm').val();
-            console.log(searchTerm);
+            var modFormData = {
+                'query': searchTerm
+            }
+            if (!modFormData.query.trim()) {
+                alert("Please write something.");
+                return;
+            }
+
+            // if there's already a table, clear it
+            if ($.fn.DataTable.isDataTable('#modTable')) {
+                $('#modTable').DataTable().clear().destroy();
+            }
+            // Clear the search box?
+            // $('#searchTerm').val('')
+
+            // show spinner
+//            document.getElementById("overlay").style.display = "block";
+
             // TODO: do backend search
+            // process the modifier form
+            $.ajax({
+                type: 'GET',
+                url: 'getSimilarMods',
+                data: modFormData,
+                dataType: 'json',
+                encode: true
+            })
+            .fail(function (jqXHR, textStatus) {
+                // hide spinner
+                document.getElementById("overlay").style.display = "none";
+                console.log(jqXHR);
+                console.log(textStatus);
+                alert("request failed: " + textStatus);
+            })
+            .done(function (data) {
+                console.log(data);
+                $('#modTable').DataTable({
+                    data: data,
+                    columns: [
+                        { title: "result" },
+                        { title: "similarity" },
+                        { title: "" }
+                    ]
+                });
+                // hide spinner
+                document.getElementById("overlay").style.display = "none";
+            });
 
-            // todo: table with results
-
-            // todo: add selected as modifiers, add rows to table in the other container...
-            addRow("svoTable")
 
     });
 
-    function addRow(tableID) {
+    document.getElementById('addModBtn').onclick = function() {
+//        form.target = '_blank';
+        // todo: add selected as modifiers, add rows to table in the other container...
+        var modId = "mod" + nMods;
+        addSVORow("svoTable", modId, "instrument", "instrument", "with")
+        nMods += 1;
+    }
+
+
+// --------------------------------------------------------------------------------------------------------
+//                               RULE BUILDING TABLE FORMATTING METHODS
+// --------------------------------------------------------------------------------------------------------
+
+    // Adds row in place
+    function addSVORow(tableID, rowPrefix, role, label, constraints) {
       // Get a reference to the table
-      let tableRef = document.getElementById(tableID);
+      let tableRef = document.getElementById(tableID).getElementsByTagName('tbody')[0];
 
       // Insert a row at the end of the table
-      let newRow = tableRef.insertRow(-1);
+       var newRow = createSVORowElement(rowPrefix, role, label, constraints);
+       tableRef.appendChild(newRow);
+    }
 
-      // Insert a cell in the row at index 0
-      let newCell = newRow.insertCell(0);
+    /**Method for creating new rows to go into the SVO main table.  Each row corresponds
+     * to a modifier, as specified in the top right container.
+     */
+    function createSVORowElement(rowPrefix, role, label, constraints) {
+        // first 3 columns (role, label, and constraints)
+        var col1Html = "<td> <p> " + role + "</p> </td>";
+        var col2Html = '<td> <p> <input type="text" id="' + rowPrefix + 'Label" value="' + label + '"> </p> </td>';
+        var col3Html = '<td> <p> <input type="text" id="' + rowPrefix + 'Words" value="' + constraints + '"> </p> </td>';
+        // radio buttons
+        var col4Html = '<td> <p> <input type="radio" name="' + rowPrefix + 'Radio" value="required" checked> </p> </td>';
+        var col5Html = '<td> <p> <input type="radio" name="' + rowPrefix + 'Radio" value="optional"> </p> </td>';
 
-      // Append a text node to the cell
-      let newText = document.createTextNode('New bottom row');
-      newCell.appendChild(newText);
+        var rowFragment = document.createElement('tr');
+        rowFragment.classList.add("pad")
+        rowFragment.innerHTML = col1Html + col2Html + col3Html + col4Html + col5Html;
+
+        return rowFragment;
+    }
+
+    function createRadioElement(name, value, checked) {
+        var radioHtml = '<input type="radio" name="' + name + '"';
+        radioHtml += ' value="' + value +'"';
+        if ( checked ) {
+            radioHtml += ' checked';
+        }
+        radioHtml += '/>';
+
+        var radioFragment = document.createElement('div');
+        radioFragment.innerHTML = radioHtml;
+
+        return radioFragment.firstChild;
     }
 
 });
 
 // --------------------------------------------------------------------------------------------------------
-//                                      TABLE FORMATTING METHODS
+//                                   RESULTS TABLE FORMATTING METHODS
 // --------------------------------------------------------------------------------------------------------
 
 

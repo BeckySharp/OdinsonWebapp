@@ -19,7 +19,7 @@
 </head>
 
 <body>
-<div class="container-fluid">
+<div class="container-fluid flex-fill">
 <h1>Odinson Rule Development Simple UI</h1>
 </div>
 <!--new rule-->
@@ -33,9 +33,10 @@
 </div>
 
 
-<div class="container">
-    <div class="row align-items-start">
-        <div class="col-8">
+<div class="container-fluid flex-fill d-flex flex-column">
+    <div class="row flex-fill">
+        <!-- SVO Rule builder panel-->
+        <div class="col-6 d-flex flex-column resizable">
             <form id="svoForm">
                 <h2>Develop Rule:</h2>
                 <p> rule name: <input type="text" id="rulename" value="example-rule"> </p>
@@ -48,59 +49,66 @@
                         <th> opt </th>
                     </tr>
                     <tr class="pad">
-                        <th > subject </th>
-                        <th> <p> <input type="text" id="sLabel" placeholder="subject"> </p> </th>
-                        <th> <p> <input type="text" value="" id="sWords"> </p> </th>
-                        <th>
+                        <td> subject </td>
+                        <td> <p> <input type="text" id="sLabel" placeholder="subject"> </p> </td>
+                        <td> <p> <input type="text" value="" id="sWords"> </p> </td>
+                        <td>
                             <input type="radio" value="required" name="subj_radio" checked>
-                        </th>
-                        <th>
+                        </td>
+                        <td>
                             <input type="radio" value="optional" name="subj_radio">
-                        </th>
+                        </td>
                     </tr>
                     <tr class="pad">
-                        <th> verb </th>
-                        <th> <p> <input type="text" placeholder="verb" id="vLabel"> </p> </th>
-                        <th> <p> <input type="text" value="" id="vWords"> </p> </th>
-                        <th>
+                        <td> verb </td>
+                        <td> <p> <input type="text" placeholder="verb" id="vLabel"> </p> </td>
+                        <td> <p> <input type="text" value="" id="vWords"> </p> </td>
+                        <td>
                             <input type="radio" value="required" name="verb_radio" checked>
-                        </th>
-                        <th>
+                        </td>
+                        <td>
                             <input type="radio" value="optional" name="verb_radio">
-                        </th>
+                        </td>
                     </tr>
                     <tr class="pad">
-                        <th> object </th>
-                        <th> <p> <input type="text" placeholder="object" id="oLabel"> </p> </th>
-                        <th> <p> <input type="text" value="" id="oWords"> </p> </th>
-                        <th>
+                        <td> object </td>
+                        <td> <p> <input type="text" placeholder="object" id="oLabel"> </p> </td>
+                        <td> <p> <input type="text" value="" id="oWords"> </p> </td>
+                        <td>
                             <input type="radio" value="required" name="obj_radio" checked>
-                        </th>
-                        <th>
+                        </td>
+                        <td>
                             <input type="radio" value="optional" name="obj_radio">
-                        </th>
+                        </td>
                     </tr>
                 </table>
                 <br>
                 <input class="submitbutton main" type="submit" value="SUBMIT">
             </form>
         </div>
-        <div class="col">
-        <!--  Nest another set: 2 rows, each with one column-->
-            <div class="row">
-                <div class="col">
+        <!-- RHS panel-->
+        <div class="col d-flex flex-column">
+            <!-- Rule modifications panel-->
+            <div class="col">
+                <div class="col outlined resizable">
 
                     <form id="modifierForm">
                         <h2>Add extra information:</h2>
-                        <p> (inactive) <input type="text" id="searchTerm"> <input class="submitbutton sm" type="submit" value="SEARCH">
+                        <p> (inactive) <input type="text" id="searchTerm"> <input class="submitbutton sm" id="searchBtn" type="submit" value="SEARCH">
                         </p>
+                        Similar options:
+                        <table id="modTable" class="mod svo" width="100%">
+                            <caption id="modtablecaption"></caption>
+                        </table>
+                        <input class="submitbutton sm" id="addModBtn" type="button" value="ADD MODIFICATIONS">
 
                     </form>
 
                 </div>
             </div>
-            <div class="row">
-                <div class="col">
+            <!-- grammar builder panel-->
+            <div class="col">
+                <div class="col outlined resizable">
                     This is the saved grammar panel
                     <br><br><br>
                 </div>
@@ -109,7 +117,7 @@
     </div>
 </div>
 
-<div class="container-fluid">
+<div class="container-fluids flex-fill">
     <!--extractions table at the bottom-->
     <table id="results" class="display svo" width="100%">
         <caption id="tablecaption"></caption>

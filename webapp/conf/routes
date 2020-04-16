@@ -8,6 +8,7 @@ GET     /                           controllers.HomeController.dev
 GET    /simple                      controllers.HomeController.simple
 GET    /customRules                 controllers.HomeController.getCustomRuleResults(rules: String, export: Boolean)
 GET    /buildRules                 controllers.HomeController.buildRules(data: String)
+GET     /getSimilarMods                   controllers.HomeController.getSimilarMods(query: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

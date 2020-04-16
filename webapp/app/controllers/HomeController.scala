@@ -77,4 +77,13 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     CorpusReader.writeMatchesTo(matches, outfile)
   }
 
+  def getSimilarMods(query: String) = Action {
+    println("*************************************")
+    println(query)
+    val tokens = query.split(" ")
+
+
+    Ok(Json.toJson(true))
+  }
+
 }
