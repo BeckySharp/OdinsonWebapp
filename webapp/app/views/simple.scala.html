@@ -7,6 +7,7 @@
     <title>Odinson Rule Development UI</title>
     <link rel="stylesheet" type="text/css" href="assets/plugins/bootstrap-4.4.1/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/containers.css"/>
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/jquery.dataTables.min.css"/>
     <link rel="stylesheet" href="assets/plugins/DataTables/colReorder.css" />
     <script type="text/javascript" src="assets/javascripts/jquery-3.4.1.js"></script>
@@ -19,7 +20,7 @@
 </head>
 
 <body>
-<div class="container-fluid flex-fill">
+<div class="container-fluid flex-fill p-4">
 <h1>Odinson Rule Development Simple UI</h1>
 </div>
 <!--new rule-->
@@ -33,10 +34,10 @@
 </div>
 
 
-<div class="container-fluid flex-fill d-flex flex-column">
+<div class="container-fluid flex-fill d-flex flex-column padded align-top" >
     <div class="row flex-fill">
         <!-- SVO Rule builder panel-->
-        <div class="col-6 d-flex flex-column resizable">
+        <div class="col-6 padded d-flex flex-column resizable outlined">
             <form id="svoForm">
                 <h2>Develop Rule:</h2>
                 <p> rule name: <input type="text" id="rulename" value="example-rule"> </p>
@@ -89,8 +90,8 @@
         <!-- RHS panel-->
         <div class="col d-flex flex-column">
             <!-- Rule modifications panel-->
-            <div class="col">
-                <div class="col outlined resizable">
+            <div class="col  align-top">
+                <div class="col padded outlined resizable">
 
                     <form id="modifierForm">
                         <h2>Add extra information:</h2>
@@ -107,8 +108,8 @@
                 </div>
             </div>
             <!-- grammar builder panel-->
-            <div class="col">
-                <div class="col outlined resizable">
+            <div class="col vert-padded">
+                <div class="col padded outlined resizable">
                     This is the saved grammar panel
                     <br><br><br>
                 </div>
@@ -117,7 +118,7 @@
     </div>
 </div>
 
-<div class="container-fluids flex-fill">
+<div class="container-fluids p-3 flex-fill">
     <!--extractions table at the bottom-->
     <table id="results" class="display svo" width="100%">
         <caption id="tablecaption"></caption>

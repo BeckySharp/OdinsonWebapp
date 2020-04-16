@@ -1,0 +1,41 @@
+.container .row {
+        overflow: auto;
+        vertical-align: top;
+}
+
+.container-fluid .outlined {
+    border: 2px solid var(--odinson-lt-gray);
+    overflow: auto;
+    vertical-align: top;
+}
+
+.container-fluid {
+    border: 0px solid var(--odinson-lt-gray);
+    overflow: auto;
+    vertical-align: top;
+
+}
+
+.resizable {
+    resize: vertical;
+    overflow: auto;
+ }
+
+ .flex-fill {
+     flex: 1 1 auto;
+ }
+
+ .full-height {height: 100%;}
+ .half-height {height: 50%;}
+
+ .padded {
+    padding-left: 25px !important;
+    padding-right: 25px !important;
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+ }
+
+ .vert-padded {
+     padding-top: 15px !important;
+     padding-bottom: 15px !important;
+  }
