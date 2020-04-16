@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 import javax.inject._
-import org.clulab.reading.{CorpusReader, Match}
+import org.clulab.reading.{CorpusReader, Match, RuleBuilder}
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -19,6 +19,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   // -------------------------------------------------
   println("CorpusReader is getting started ...")
   val reader = CorpusReader.fromConfig
+  lazy val ruleBuilder = new RuleBuilder()
   println("CorpusReader is ready to go ...")
   // -------------------------------------------------
 
@@ -40,12 +41,9 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   def getCustomRuleResults(rules: String, exportMatches: Boolean) = Action {
     // println(s"[DEV] Query: <<$query>>\tRULE: <<$rule>>")
-    val matches = reader.extractMatches(rules)
+    val matches = reader.extractMatchesFromRules(rules)
     if (exportMatches) {
-      // fixme
-      val localDateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss")
-      val outfile = s"${ruleNameHack(rules)}_${localDateFormat.format(new Date)}.jsonl"
-      CorpusReader.writeMatchesTo(matches, outfile)
+      exportResults(ruleNameHack(rules), matches)
     }
     val resultsByRule = reader.consolidateMatches(matches)
     println(s"num results: ${resultsByRule.toSeq.flatMap(_._2).length}")
@@ -62,14 +60,21 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   def buildRules(data:String) = Action {
     println(data)
-    val j = Json.parse(data)
-    val ruleName = j("ruleName")
-    val subj = j("subj")
-    val verb = j("verb")
-    val obj = j("obj")
+    val j = ujson.read(data)
+    val rules = ruleBuilder.buildRules(j)
+    val matches = reader.extractMatchesFromRules(rules)
+    // TODO: export if desired
+    val resultsByRule = reader.consolidateMatches(matches)
+    println(s"num results: ${resultsByRule.toSeq.flatMap(_._2).length}")
+    val out = JsonUtils.mkJsonDict(resultsByRule)
+    Ok(out)
+  }
 
-    val output = Json.toJson("")
-    Ok(output)
+  def exportResults(filePrefix: String, matches: Seq[Match]): Unit = {
+    // fixme
+    val localDateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss")
+    val outfile = s"${filePrefix}_${localDateFormat.format(new Date)}.jsonl"
+    CorpusReader.writeMatchesTo(matches, outfile)
   }
 
 }

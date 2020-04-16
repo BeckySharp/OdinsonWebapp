@@ -66,8 +66,13 @@ class CorpusReader(
    * @param rules
    * @return Map[ruleName, consolidated extractions for that rule]
    */
-  def extractMatches(rules: String): Seq[Match] = {
-    val extractors = mkExtractorsFromRules(rules)
+  def extractMatchesFromRules(rules: String): Seq[Match] = {
+    val extractors = extractorEngine.ruleReader.compileRuleFile(rules)
+    extractMatches(extractors)
+  }
+
+  def extractMatchesFromRules(rules: Seq[Rule]): Seq[Match] = {
+    val extractors = extractorEngine.ruleReader.mkExtractors(rules)
     extractMatches(extractors)
   }
 
@@ -144,9 +149,6 @@ class CorpusReader(
     matches.sortBy(-_.count)
   }
 
-  private def mkExtractorsFromRules(rules: String): Seq[Extractor] = {
-    extractorEngine.ruleReader.compileRuleFile(rules.mkString)
-  }
 
   /**
    * Create a representation of each the named captures that has: (a) the label of the named capture,
