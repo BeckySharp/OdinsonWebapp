@@ -1,19 +1,27 @@
 <html>
 <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <title>Odinson Rule Development UI</title>
+    <link rel="stylesheet" type="text/css" href="assets/plugins/bootstrap-4.4.1/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/jquery.dataTables.min.css"/>
-    <link rel="stylesheet" href="assets/plugins/DataTables/colReorder.css">
-    <script type="text/javascript" src="assets/javascripts/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="assets/plugins/DataTables/colReorder.css" />
+    <script type="text/javascript" src="assets/javascripts/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="assets/javascripts/popper.js"></script>
+    <script type="text/javascript" src="assets/plugins/bootstrap-4.4.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="assets/javascripts/jquery.dataTables.min.js"></script>
     <script src="assets/plugins/DataTables/colReorder.js"></script>
     <script type="text/javascript" src="assets/javascripts/simple.js"></script>
 
-
 </head>
 
 <body>
+<div class="container-fluid">
 <h1>Odinson Rule Development Simple UI</h1>
+</div>
 <!--new rule-->
 
 <!--3 panes-->
@@ -24,62 +32,89 @@
     </div>
 </div>
 
-<form id="svoForm">
-    <h2>Develop Rule:</h2>
-    <p> rule name: <input type="text" id="rulename" value="example-rule"> </p>
-    <table class="svo">
-        <tr class="pad-top">
-            <th> </th>
-            <th> <p> Label </p> </th>
-            <th> <p> Word(s) </p> </th>
-            <th> req </th>
-            <th> opt </th>
-        </tr>
-        <tr class="pad">
-            <th > subject </th>
-            <th> <p> <input type="text" id="sLabel" placeholder="subject"> </p> </th>
-            <th> <p> <input type="text" value="" id="sWords"> </p> </th>
-            <th>
-                <input type="radio" value="required" name="subj_radio" checked>
-            </th>
-            <th>
-                <input type="radio" value="optional" name="subj_radio">
-            </th>
-        </tr>
-        <tr class="pad">
-            <th> verb </th>
-            <th> <p> <input type="text" placeholder="verb" id="vLabel"> </p> </th>
-            <th> <p> <input type="text" value="" id="vWords"> </p> </th>
-            <th>
-                <input type="radio" value="required" name="verb_radio" checked>
-            </th>
-            <th>
-                <input type="radio" value="optional" name="verb_radio">
-            </th>
-        </tr>
-        <tr class="pad">
-            <th> object </th>
-            <th> <p> <input type="text" placeholder="object" id="oLabel"> </p> </th>
-            <th> <p> <input type="text" value="" id="oWords"> </p> </th>
-            <th>
-                <input type="radio" value="required" name="obj_radio" checked>
-            </th>
-            <th>
-                <input type="radio" value="optional" name="obj_radio">
-            </th>
-        </tr>
+
+<div class="container">
+    <div class="row align-items-start">
+        <div class="col-8">
+            <form id="svoForm">
+                <h2>Develop Rule:</h2>
+                <p> rule name: <input type="text" id="rulename" value="example-rule"> </p>
+                <table id="svoTable" class="svo">
+                    <tr class="pad-top">
+                        <th> </th>
+                        <th> <p> Label </p> </th>
+                        <th> <p> Word(s) </p> </th>
+                        <th> req </th>
+                        <th> opt </th>
+                    </tr>
+                    <tr class="pad">
+                        <th > subject </th>
+                        <th> <p> <input type="text" id="sLabel" placeholder="subject"> </p> </th>
+                        <th> <p> <input type="text" value="" id="sWords"> </p> </th>
+                        <th>
+                            <input type="radio" value="required" name="subj_radio" checked>
+                        </th>
+                        <th>
+                            <input type="radio" value="optional" name="subj_radio">
+                        </th>
+                    </tr>
+                    <tr class="pad">
+                        <th> verb </th>
+                        <th> <p> <input type="text" placeholder="verb" id="vLabel"> </p> </th>
+                        <th> <p> <input type="text" value="" id="vWords"> </p> </th>
+                        <th>
+                            <input type="radio" value="required" name="verb_radio" checked>
+                        </th>
+                        <th>
+                            <input type="radio" value="optional" name="verb_radio">
+                        </th>
+                    </tr>
+                    <tr class="pad">
+                        <th> object </th>
+                        <th> <p> <input type="text" placeholder="object" id="oLabel"> </p> </th>
+                        <th> <p> <input type="text" value="" id="oWords"> </p> </th>
+                        <th>
+                            <input type="radio" value="required" name="obj_radio" checked>
+                        </th>
+                        <th>
+                            <input type="radio" value="optional" name="obj_radio">
+                        </th>
+                    </tr>
+                </table>
+                <br>
+                <input class="submitbutton main" type="submit" value="SUBMIT">
+            </form>
+        </div>
+        <div class="col">
+        <!--  Nest another set: 2 rows, each with one column-->
+            <div class="row">
+                <div class="col">
+
+                    <form id="modifierForm">
+                        <h2>Add extra information:</h2>
+                        <p> (inactive) <input type="text" id="searchTerm"> <input class="submitbutton sm" type="submit" value="SEARCH">
+                        </p>
+
+                    </form>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    This is the saved grammar panel
+                    <br><br><br>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <!--extractions table at the bottom-->
+    <table id="results" class="display svo" width="100%">
+        <caption id="tablecaption"></caption>
     </table>
-
-
-
-    <br>
-    <input class="submitbutton" type="submit" value="SUBMIT">
-</form>
-
-<!--extractions table at the bottom-->
-<table id="results" class="display svo" width="100%">
-    <caption id="tablecaption"></caption>
-</table>
+</div>
 
 </body>
 </html>

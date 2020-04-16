@@ -75,20 +75,29 @@ textarea {
 
 /* for the form submit button style */
 .submitbutton
-{
-padding: 4px 18px 4px !important;
-font-size: 11px;
-background-color: #ffffff;
-font-weight: bold;
-color: var(--odinson-dk-blue);
-border-radius: 80px;
--moz-border-radius: 80px;
--webkit-border-radius: 80px;
-border: 1px solid var(--odinson-dk-blue);
-cursor: pointer;
-outline: none;
+ {
+ background-color: #ffffff;
+ font-weight: bold;
+ color: var(--odinson-dk-blue);
+ border-radius: 80px;
+ -moz-border-radius: 80px;
+ -webkit-border-radius: 80px;
+ border: 1px solid var(--odinson-dk-blue);
+ cursor: pointer;
+ outline: none;
 
-}
+ }
+
+ .submitbutton.main {
+ padding: 4px 18px 4px !important;
+  font-size: 11px;
+ }
+
+ .submitbutton.sm
+ {
+ padding: 3px 10px 3px !important;
+ font-size: 10px;
+ }
 
 .submitbutton:hover
 {
@@ -192,4 +201,19 @@ tr.grey td {
 
 .checkbox > input:active {
     border: 2px solid var(--odinson-dk-blue);
+}
+
+.container .row {
+    min-height: 100px;
+}
+
+
+.container .col {
+    border: 2px solid var(--odinson-dk-blue);
+    min-height: 100px;
+}
+
+.container .col-8 {
+    border: 2px solid var(--odinson-dk-blue);
+    min-height: 200px;
 }

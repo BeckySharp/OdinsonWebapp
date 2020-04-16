@@ -1,8 +1,21 @@
 
-$(document).ready(function () {
+$(window).on("load", function () {
 
+//    var grid = GridStack.init({
+//        "data-gs-width" : 10,
+//    });
+////    grid.addWidget( jQuery( '<div class="grid-stack-item"><div class="grid-stack-item-content">' + "ABC" + '</div></div>' ),  0, 0, 6, 4, false);
+//    grid.addWidget( $("#svoForm"),  0, 0, 6, 4, false);
+//    grid.addWidget( jQuery( '<div class="grid-stack-item"><div class="grid-stack-item-content">' + "XYZ" + '</div></div>' ),  6, 0, 4, 2, false);
+//    grid.addWidget( jQuery( '<div class="grid-stack-item"><div class="grid-stack-item-content">' + "123" + '</div></div>' ),  6, 1, 4, 2, false);
+
+//    grid.commit();
+
+    // -----------------------------------------------
+    //           Form for querying the index
+    // -----------------------------------------------
     var form = $("#svoForm");
-    $('form').submit(function (event) {
+    form.submit(function (event) {
 
         // stop the form from submitting the normal way and refreshing the page
         event.preventDefault();
@@ -117,6 +130,42 @@ $(document).ready(function () {
             tr.addClass('shown');
         }
     } );
+
+    // -----------------------------------------------
+    //           Form for adding modification
+    // -----------------------------------------------
+    var modForm = $("#modifierForm");
+    modForm.submit(function (event) {
+
+            // stop the form from submitting the normal way and refreshing the page
+            event.preventDefault();
+
+            // Get search term
+            var searchTerm = $('#searchTerm').val();
+            console.log(searchTerm);
+            // TODO: do backend search
+
+            // todo: table with results
+
+            // todo: add selected as modifiers, add rows to table in the other container...
+            addRow("svoTable")
+
+    });
+
+    function addRow(tableID) {
+      // Get a reference to the table
+      let tableRef = document.getElementById(tableID);
+
+      // Insert a row at the end of the table
+      let newRow = tableRef.insertRow(-1);
+
+      // Insert a cell in the row at index 0
+      let newCell = newRow.insertCell(0);
+
+      // Append a text node to the cell
+      let newText = document.createTextNode('New bottom row');
+      newCell.appendChild(newText);
+    }
 
 });
 
