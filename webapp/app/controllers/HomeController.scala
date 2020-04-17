@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 import javax.inject._
-import org.clulab.reading.{CorpusReader, Match, RuleBuilder}
+import org.clulab.reading.{CorpusReader, DependencySearcher, Match, RuleBuilder}
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -20,6 +20,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   println("CorpusReader is getting started ...")
   val reader = CorpusReader.fromConfig
   lazy val ruleBuilder = new RuleBuilder()
+  lazy val nmodSearcher = new DependencySearcher
   println("CorpusReader is ready to go ...")
   // -------------------------------------------------
 
@@ -78,12 +79,9 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   }
 
   def getSimilarMods(query: String) = Action {
-    println("*************************************")
-    println(query)
-    val tokens = query.split(" ")
-
-
-    Ok(Json.toJson(true))
+    val similarNmods = nmodSearcher.mostSimilar(query)
+    val json = JsonUtils.mkJsonSimilarities(similarNmods)
+    Ok(json)
   }
 
 }

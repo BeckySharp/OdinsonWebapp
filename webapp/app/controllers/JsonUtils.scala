@@ -1,6 +1,6 @@
 package controllers
 
-import org.clulab.reading.{ConsolidatedMatch, Evidence, ResultView}
+import org.clulab.reading.{ConsolidatedMatch, DependencySimilarity, Evidence, ResultView}
 import play.api.libs.json._
 
 /** utilities to convert odin mentions into json objects
@@ -48,6 +48,17 @@ object JsonUtils {
       "id" -> e.docID,
       "sentence" -> e.sentence
     )
+  }
+
+  def mkJsonSimilarities(dss: Seq[DependencySimilarity]): JsValue = {
+    Json.arr(dss.zipWithIndex.map(tup => mkJson(tup._1, tup._2)): _*)
+  }
+
+  def mkJson(ds: DependencySimilarity, i: Int): Json.JsValueWrapper = {
+    Json.arr(
+      i,
+      ds.display,
+      ds.score)
   }
 
 }

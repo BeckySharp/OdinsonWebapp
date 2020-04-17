@@ -49,6 +49,9 @@ table.svo {
     text-align: center;
 }
 
+tr > td:last-child > button {visibility:hidden;}
+tr:hover > td:last-child > button {visibility:visible;}
+
 .svo input {
     border: 1px solid var(--odinson-lt-gray);
     border-radius: 10px;
@@ -68,9 +71,15 @@ h1 {
 }
 
 h2 {
+    font-size: 120%;
+    color: #2471A3;
+}
+
+h3 {
     font-size: 110%;
     color: #2471A3;
 }
+
 
 textarea {
     font-size: inherit;

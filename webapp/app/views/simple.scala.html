@@ -10,10 +10,12 @@
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/containers.css"/>
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/jquery.dataTables.min.css"/>
     <link rel="stylesheet" href="assets/plugins/DataTables/colReorder.css" />
+    <link rel="stylesheet" href="assets/plugins/jquery-datatables-checkboxes-1.2.11/css/dataTables.checkboxes.css" />
     <script type="text/javascript" src="assets/javascripts/jquery-3.4.1.js"></script>
     <script type="text/javascript" src="assets/javascripts/popper.js"></script>
     <script type="text/javascript" src="assets/plugins/bootstrap-4.4.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="assets/javascripts/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="assets/plugins/jquery-datatables-checkboxes-1.2.11/js/dataTables.checkboxes.min.js"></script>
     <script src="assets/plugins/DataTables/colReorder.js"></script>
     <script type="text/javascript" src="assets/javascripts/simple.js"></script>
 
@@ -39,7 +41,8 @@
         <!-- SVO Rule builder panel-->
         <div class="col-6 padded d-flex flex-column resizable outlined">
             <form id="svoForm">
-                <h2>Develop Rule:</h2>
+                <h1>Rule Workspace</h1>
+                <br>
                 <p> rule name: <input type="text" id="rulename" value="example-rule"> </p>
                 <table id="svoTable" class="svo">
                     <tr class="pad-top">
@@ -58,6 +61,7 @@
                         </td>
                         <td>
                             <input type="radio" value="optional" name="subj_radio">
+                            <button>x</button>
                         </td>
                     </tr>
                     <tr class="pad">
@@ -69,6 +73,7 @@
                         </td>
                         <td>
                             <input type="radio" value="optional" name="verb_radio">
+                            <button>x</button>
                         </td>
                     </tr>
                     <tr class="pad">
@@ -80,28 +85,31 @@
                         </td>
                         <td>
                             <input type="radio" value="optional" name="obj_radio">
+                            <button>x</button>
                         </td>
                     </tr>
                 </table>
                 <br>
-                <input class="submitbutton main" type="submit" value="SUBMIT">
+                <input class="submitbutton main" type="submit" value="TEST RULE">
             </form>
         </div>
         <!-- RHS panel-->
         <div class="col d-flex flex-column">
             <!-- Rule modifications panel-->
-            <div class="col  align-top">
+            <div class="col align-top">
                 <div class="col padded outlined resizable">
-
+                    <h1>Extra information</h1>
+                    <br>
                     <form id="modifierForm">
-                        <h2>Add extra information:</h2>
-                        <p> (inactive) <input type="text" id="searchTerm"> <input class="submitbutton sm" id="searchBtn" type="submit" value="SEARCH">
-                        </p>
-                        Similar options:
+                        <h2>
+                            <p> Add argument based on: <input type="text" id="searchTerm">
+                                <input class="submitbutton sm" id="searchBtn" type="submit" value="SEARCH"> </p>
+                        </h2>
+                        <h2> Similar options: </h2>
                         <table id="modTable" class="mod svo" width="100%">
                             <caption id="modtablecaption"></caption>
                         </table>
-                        <input class="submitbutton sm" id="addModBtn" type="button" value="ADD MODIFICATIONS">
+                        <input class="submitbutton sm" id="addModBtn" type="button" value="ADD TO RULE">
 
                     </form>
 
@@ -110,6 +118,8 @@
             <!-- grammar builder panel-->
             <div class="col vert-padded">
                 <div class="col padded outlined resizable">
+                    <h1>Saved rules</h1>
+                    <br>
                     This is the saved grammar panel
                     <br><br><br>
                 </div>

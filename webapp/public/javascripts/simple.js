@@ -136,6 +136,7 @@ $(window).on("load", function () {
     // -----------------------------------------------
     var nMods = 0;
     var modForm = $("#modifierForm");
+    var selectedMods = [];
     modForm.submit(function (event) {
 
             // stop the form from submitting the normal way and refreshing the page
@@ -179,28 +180,68 @@ $(window).on("load", function () {
             })
             .done(function (data) {
                 console.log(data);
-                $('#modTable').DataTable({
+                var table = $('#modTable').DataTable({
+                    searching: false,
+//                    pageLength: 5,
+//                    lengthChange: false,
+                    select: {
+                             'style': 'multi'
+                            },
+                    order: [[2, 'desc']],
                     data: data,
+                    columnDefs: [
+                         {
+                            'targets': 0,
+                            'checkboxes': {
+                               'selectRow': true
+                            }
+                         }
+                    ],
                     columns: [
+                        { title: "select" },
                         { title: "result" },
-                        { title: "similarity" },
-                        { title: "" }
+                        { title: "score" },
                     ]
                 });
                 // hide spinner
                 document.getElementById("overlay").style.display = "none";
+
+                // Handle form submission event
+               $('#addModBtn').on('click', function(e){
+                  var form = this;
+                  var selectedMods = [];
+
+                  var rows_selected = table.column(0).checkboxes.selected();
+                  console.log("rows_selected", rows_selected);
+
+                  // Iterate over all selected checkboxes
+                  $.each(rows_selected, function(index, rowId){
+                     // Create a hidden element
+                     selectedMods.push(
+                         rowId
+                     );
+                  });
+                  console.log("selectedMods", selectedMods)
+                  var modId = "mod" + nMods;
+                  var argInitName = "custom_" + nMods;
+                  addSVORow("svoTable", modId, "custom", argInitName, "with")
+                  nMods += 1;
+               });
             });
 
+//
 
     });
 
-    document.getElementById('addModBtn').onclick = function() {
-//        form.target = '_blank';
-        // todo: add selected as modifiers, add rows to table in the other container...
-        var modId = "mod" + nMods;
-        addSVORow("svoTable", modId, "instrument", "instrument", "with")
-        nMods += 1;
-    }
+//    document.getElementById('addModBtn').onclick = function() {
+//
+//        console.log("selectedMods", selectedMods)
+////        form.target = '_blank';
+//        // todo: add selected as modifiers, add rows to table in the other container...
+////        var modId = "mod" + nMods;
+////        addSVORow("svoTable", modId, "instrument", "instrument", "with")
+////        nMods += 1;
+//    }
 
 
 // --------------------------------------------------------------------------------------------------------
@@ -223,7 +264,7 @@ $(window).on("load", function () {
     function createSVORowElement(rowPrefix, role, label, constraints) {
         // first 3 columns (role, label, and constraints)
         var col1Html = "<td> <p> " + role + "</p> </td>";
-        var col2Html = '<td> <p> <input type="text" id="' + rowPrefix + 'Label" value="' + label + '"> </p> </td>';
+        var col2Html = '<td> <p> <input type="text" id="' + rowPrefix + 'Label" placeholder="' + label + '"> </p> </td>';
         var col3Html = '<td> <p> <input type="text" id="' + rowPrefix + 'Words" value="' + constraints + '"> </p> </td>';
         // radio buttons
         var col4Html = '<td> <p> <input type="radio" name="' + rowPrefix + 'Radio" value="required" checked> </p> </td>';
@@ -250,7 +291,22 @@ $(window).on("load", function () {
         return radioFragment.firstChild;
     }
 
+    $('table td:last-child button').click(function(e) {
+      var answer = confirm("Delete row?")
+      if (answer) {
+
+       var $row = $(this).closest('tr');
+       $row.remove();
+
+      } else {
+        //some code
+      }
+
+    });
+
 });
+
+
 
 // --------------------------------------------------------------------------------------------------------
 //                                   RESULTS TABLE FORMATTING METHODS
