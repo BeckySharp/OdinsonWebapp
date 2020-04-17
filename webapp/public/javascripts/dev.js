@@ -156,6 +156,10 @@ $(document).ready(function () {
             alert("request failed: " + textStatus);
         })
         .done(function (data) {
+            // Display if there are no results
+            if (data.length == 0) {
+                $('#tablecaption').text("Rule returned no results.");
+            }
             for (let i = 0; i < data.length; i++) {
                 var ruleData = ruleDisplay(data[i])
                 var arguments = ruleData[0]
