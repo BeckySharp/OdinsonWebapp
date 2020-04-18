@@ -1,15 +1,7 @@
 
 $(window).on("load", function () {
 
-//    var grid = GridStack.init({
-//        "data-gs-width" : 10,
-//    });
-////    grid.addWidget( jQuery( '<div class="grid-stack-item"><div class="grid-stack-item-content">' + "ABC" + '</div></div>' ),  0, 0, 6, 4, false);
-//    grid.addWidget( $("#svoForm"),  0, 0, 6, 4, false);
-//    grid.addWidget( jQuery( '<div class="grid-stack-item"><div class="grid-stack-item-content">' + "XYZ" + '</div></div>' ),  6, 0, 4, 2, false);
-//    grid.addWidget( jQuery( '<div class="grid-stack-item"><div class="grid-stack-item-content">' + "123" + '</div></div>' ),  6, 1, 4, 2, false);
 
-//    grid.commit();
 
     // -----------------------------------------------
     //           Form for querying the index
@@ -100,16 +92,9 @@ $(window).on("load", function () {
                 var nArgs = args.length
                 var ruleRows = ruleData[1]
 
-                console.log(ruleRows)
                 var ruleName = ruleData[2]
                 $('#tablecaption').text(ruleName);
                 $('#results').DataTable({
-//                    "oLanguage": {
-//                      "infoEmpty": "No data available in table",
-//                      "zeroRecords": "No records to display",
-//                       "sEmptyTable": "No data available in table"
-//
-//                    },
                     colReorder: true,
                     destroy: true,
                     data: ruleRows,
@@ -225,7 +210,7 @@ $(window).on("load", function () {
                   var selectedMods = [];
 
                   var rows_selected = table.column(0).checkboxes.selected();
-                  console.log("rows_selected", rows_selected);
+//                  console.log("rows_selected", rows_selected);
 
                   // Iterate over all selected checkboxes
                   $.each(rows_selected, function(index, rowId){
@@ -234,7 +219,7 @@ $(window).on("load", function () {
                          rowId
                      );
                   });
-                  console.log("selectedMods", selectedMods)
+//                  console.log("selectedMods", selectedMods)
                   var modId = "mod" + nMods;
                   var argInitName = "custom_" + nMods;
                   addSVORow("svoTable", modId, "custom", argInitName, "with")
@@ -280,12 +265,13 @@ $(window).on("load", function () {
         var col2Html = '<td> <p> <input type="text" id="' + rowPrefix + 'Label" placeholder="' + label + '"> </p> </td>';
         var col3Html = '<td> <p> <input type="text" id="' + rowPrefix + 'Words" value="' + constraints + '"> </p> </td>';
         // radio buttons
-        var col4Html = '<td> <p> <input type="radio" name="' + rowPrefix + 'Radio" value="required" checked> </p> </td>';
-        var col5Html = '<td> <p> <input type="radio" name="' + rowPrefix + 'Radio" value="optional"> </p> </td>';
+        var col4Html = '<td> <input type="radio" name="' + rowPrefix + 'Radio" value="required" checked> </td>';
+        var col5Html = '<td> <input type="radio" name="' + rowPrefix + 'Radio" value="optional">  </td>';
+        var col6Html = '<td class="tight-left"> <button type="button" class="delete"></button> </td>';
 
         var rowFragment = document.createElement('tr');
         rowFragment.classList.add("pad")
-        rowFragment.innerHTML = col1Html + col2Html + col3Html + col4Html + col5Html;
+        rowFragment.innerHTML = col1Html + col2Html + col3Html + col4Html + col5Html + col6Html;
 
         return rowFragment;
     }
@@ -304,18 +290,44 @@ $(window).on("load", function () {
         return radioFragment.firstChild;
     }
 
-    $('table td:last-child button').click(function(e) {
-      var answer = confirm("Delete row?")
-      if (answer) {
+//    $('table td:last-child button').click(function(e) {
+//      var answer = confirm("Delete row?")
+//      if (answer) {
+//
+//       var $row = $(this).closest('tr');
+//       $row.remove();
+//
+//      } else {
+//        //some code
+//      }
+//
+//    });
 
-       var $row = $(this).closest('tr');
-       $row.remove();
+    $('table').on('click', 'button[type="button"]', function(e){
+        Swal.fire({
+          title: 'Remove argument',
+          text: "Are you sure you want to delete this argument?",
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#255497',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.value) {
+            $(this).closest('tr').remove()
+          }
+        })
 
-      } else {
-        //some code
-      }
-
+//        var answer = confirm("Delete row?")
+//        if (answer) {
+//           $(this).closest('tr').remove()
+//        } else {
+//          //some code
+//        }
     });
+
+
+
 
 });
 

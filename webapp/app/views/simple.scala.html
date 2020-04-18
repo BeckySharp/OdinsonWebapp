@@ -6,7 +6,6 @@
 
     <title>Odinson Rule Development UI</title>
     <link rel="stylesheet" type="text/css" href="assets/plugins/bootstrap-4.4.1/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/containers.css"/>
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/jquery.dataTables.min.css"/>
     <link rel="stylesheet" href="assets/plugins/DataTables/colReorder.css" />
@@ -17,6 +16,8 @@
     <script type="text/javascript" src="assets/javascripts/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="assets/plugins/jquery-datatables-checkboxes-1.2.11/js/dataTables.checkboxes.min.js"></script>
     <script src="assets/plugins/DataTables/colReorder.js"></script>
+    <script type="text/javascript" src="assets/javascripts/sweetalert.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
     <script type="text/javascript" src="assets/javascripts/simple.js"></script>
 
 </head>
@@ -35,7 +36,6 @@
     </div>
 </div>
 
-
 <div class="container-fluid flex-fill d-flex flex-column padded align-top" >
     <div class="row flex-fill">
         <!-- SVO Rule builder panel-->
@@ -47,46 +47,55 @@
                 <table id="svoTable" class="svo">
                     <tr class="pad-top">
                         <th> </th>
-                        <th> <p> Label </p> </th>
-                        <th> <p> Word(s) </p> </th>
-                        <th> req </th>
-                        <th> opt </th>
+                        <th> Label </th>
+                        <th> Word(s)  </th>
+                        <th>  req  </th>
+                        <th>  opt  </th>
                     </tr>
                     <tr class="pad">
                         <td> subject </td>
-                        <td> <p> <input type="text" id="sLabel" placeholder="subject"> </p> </td>
-                        <td> <p> <input type="text" value="" id="sWords"> </p> </td>
+                        <td> <input type="text" id="sLabel" placeholder="subject"> </td>
+                        <td> <input type="text" value="" id="sWords"> </td>
                         <td>
                             <input type="radio" value="required" name="subj_radio" checked>
                         </td>
                         <td>
                             <input type="radio" value="optional" name="subj_radio">
-                            <button>x</button>
+                        </td>
+                        <td class="tight-left">
+                            <button type="button" class="delete"></button>
                         </td>
                     </tr>
                     <tr class="pad">
                         <td> verb </td>
-                        <td> <p> <input type="text" placeholder="verb" id="vLabel"> </p> </td>
-                        <td> <p> <input type="text" value="" id="vWords"> </p> </td>
+                        <td> <input type="text" placeholder="verb" id="vLabel"> </td>
+                        <td> <input type="text" value="" id="vWords">  </td>
                         <td>
                             <input type="radio" value="required" name="verb_radio" checked>
                         </td>
                         <td>
                             <input type="radio" value="optional" name="verb_radio">
-                            <button>x</button>
+
+                        </td>
+                        <td class="tight-left">
+                            <button type="button" class="delete"></button>
                         </td>
                     </tr>
                     <tr class="pad">
                         <td> object </td>
-                        <td> <p> <input type="text" placeholder="object" id="oLabel"> </p> </td>
-                        <td> <p> <input type="text" value="" id="oWords"> </p> </td>
+                        <td> <input type="text" placeholder="object" id="oLabel">  </td>
+                        <td> <input type="text" value="" id="oWords"> </td>
                         <td>
                             <input type="radio" value="required" name="obj_radio" checked>
                         </td>
                         <td>
                             <input type="radio" value="optional" name="obj_radio">
-                            <button>x</button>
+<!--                            <button type="button" class="delete"> </button>-->
                         </td>
+                        <td class="tight-left">
+                            <button type="button" class="delete"></button>
+                        </td>
+
                     </tr>
                 </table>
                 <br>

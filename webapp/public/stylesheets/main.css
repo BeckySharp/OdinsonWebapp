@@ -5,7 +5,6 @@
   --odinson-hover-blue: #DBE2EC;
 }
 
-
 body {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 10pt;
@@ -37,15 +36,24 @@ table.svo {
     font-weight: normal;
 }
 
+
+.svo .pad td.tight-left {
+    padding-left: 4px;
+    margin-left: 0px;
+    border: 0px solid #043D8F    ;
+}
+
+
 .svo .pad td {
     padding-left: 10pt;
-    padding-right: 10pt;
-    padding-bottom: 10pt;
+    padding-right: 4pt;
+    padding-bottom: 14pt;
 }
 
 
 .pad-top th {
     padding-top: 10pt;
+    padding-bottom: 5pt;
     text-align: center;
 }
 
@@ -147,6 +155,15 @@ textarea {
     -ms-transform: translate(-50%,-50%);
 }
 
+button.delete {
+    height: 18px;
+    width: 12px;
+    background: url('/assets/images/trash.svg') no-repeat left center;
+    cursor: pointer;
+    border: 0px;
+}
+
+
 td.details-control {
     background: url('/assets/images/plus.svg') no-repeat center center;
     cursor: pointer;
@@ -166,6 +183,8 @@ tr.shown td.details-control {
 tr.grey td {
     background: #C9D6EB ;
 }
+
+
 
 
 /* for the checkbox style */
@@ -215,3 +234,17 @@ tr.grey td {
     border: 2px solid var(--odinson-dk-blue);
 }
 
+.swal2-popup{
+    font-size: 12pt !important;
+}
+
+.swal2-title {
+    font-size: 16pt;
+}
+
+.swal2-styled {
+    padding-top: 0.425em;
+    padding-right: 1em;
+    padding-bottom: 0.425em;
+    padding-left: 1em;
+}
