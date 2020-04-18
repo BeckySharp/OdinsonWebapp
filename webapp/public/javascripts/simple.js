@@ -210,7 +210,6 @@ $(window).on("load", function () {
                   var selectedMods = [];
 
                   var rows_selected = table.column(0).checkboxes.selected();
-//                  console.log("rows_selected", rows_selected);
 
                   // Iterate over all selected checkboxes
                   $.each(rows_selected, function(index, rowId){
@@ -219,7 +218,6 @@ $(window).on("load", function () {
                          rowId
                      );
                   });
-//                  console.log("selectedMods", selectedMods)
                   var modId = "mod" + nMods;
                   var argInitName = "custom_" + nMods;
                   addSVORow("svoTable", modId, "custom", argInitName, "with")
@@ -227,26 +225,15 @@ $(window).on("load", function () {
                });
             });
 
-//
 
     });
-
-//    document.getElementById('addModBtn').onclick = function() {
-//
-//        console.log("selectedMods", selectedMods)
-////        form.target = '_blank';
-//        // todo: add selected as modifiers, add rows to table in the other container...
-////        var modId = "mod" + nMods;
-////        addSVORow("svoTable", modId, "instrument", "instrument", "with")
-////        nMods += 1;
-//    }
 
 
 // --------------------------------------------------------------------------------------------------------
 //                               RULE BUILDING TABLE FORMATTING METHODS
 // --------------------------------------------------------------------------------------------------------
 
-    // Adds row in place
+    // Adds row to the SVO/rule workspace main table
     function addSVORow(tableID, rowPrefix, role, label, constraints) {
       // Get a reference to the table
       let tableRef = document.getElementById(tableID).getElementsByTagName('tbody')[0];
@@ -256,8 +243,8 @@ $(window).on("load", function () {
        tableRef.appendChild(newRow);
     }
 
-    /**Method for creating new rows to go into the SVO main table.  Each row corresponds
-     * to a modifier, as specified in the top right container.
+    /** Method for creating new rows to go into the SVO main table.  Each row corresponds
+     *  to a modifier, as specified in the top right container.
      */
     function createSVORowElement(rowPrefix, role, label, constraints) {
         // first 3 columns (role, label, and constraints)
@@ -290,19 +277,7 @@ $(window).on("load", function () {
         return radioFragment.firstChild;
     }
 
-//    $('table td:last-child button').click(function(e) {
-//      var answer = confirm("Delete row?")
-//      if (answer) {
-//
-//       var $row = $(this).closest('tr');
-//       $row.remove();
-//
-//      } else {
-//        //some code
-//      }
-//
-//    });
-
+    // Delete a row from the table, with a confirmation check
     $('table').on('click', 'button[type="button"]', function(e){
         Swal.fire({
           title: 'Remove argument',
@@ -311,19 +286,12 @@ $(window).on("load", function () {
           showCancelButton: true,
           confirmButtonColor: '#255497',
           cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, delete it!'
+          confirmButtonText: 'Delete'
         }).then((result) => {
           if (result.value) {
             $(this).closest('tr').remove()
           }
         })
-
-//        var answer = confirm("Delete row?")
-//        if (answer) {
-//           $(this).closest('tr').remove()
-//        } else {
-//          //some code
-//        }
     });
 
 

@@ -157,7 +157,7 @@ textarea {
 
 button.delete {
     height: 18px;
-    width: 12px;
+    width: 18px;
     background: url('/assets/images/trash.svg') no-repeat left center;
     cursor: pointer;
     border: 0px;
@@ -235,7 +235,8 @@ tr.grey td {
 }
 
 .swal2-popup{
-    font-size: 12pt !important;
+    font-size: 10pt !important;
+    width: 22em;
 }
 
 .swal2-title {
@@ -247,4 +248,9 @@ tr.grey td {
     padding-right: 1em;
     padding-bottom: 0.425em;
     padding-left: 1em;
+}
+
+.swal2-icon {
+    width: 3.5em;
+    height: 3.5em;
 }
