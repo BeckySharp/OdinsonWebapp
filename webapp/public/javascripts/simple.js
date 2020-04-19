@@ -1,4 +1,15 @@
 
+function inPage(elem) {
+    var elemObj = document.getElementById(elem);
+    if(typeof elemObj === 'undefined') {
+            return false;
+        } else if(elemObj === null){
+            return false;
+        } else {
+            return true
+        }
+}
+
 $(window).on("load", function () {
 
 
@@ -50,6 +61,31 @@ $(window).on("load", function () {
         data.subj = subjectData;
         data.verb = verbData;
         data.obj = objectData;
+        data.mods = [];
+        console.log("nMods:", nMods);
+
+        for (let i = 0; i < nMods; i ++) {
+            var modData = Object();
+            // Label or default placeholder
+            var modId = 'mod' + i;
+            var modLabel = modId + 'Label';
+
+            if (inPage(modLabel)) {
+                modData.label = $('#' + modLabel).val();
+                if (!modData.label.trim()) {
+                    modData.label = document.getElementById(modLabel).placeholder;
+                };
+                var modWords = modId + 'Words';
+                modData.words = $('#' + modWords).val();
+                var modRadio = modId + "Radio";
+                modData.argType = form.find("input[name=" + modRadio + "]:checked").val();
+                data.mods.push(modData);
+            }
+
+
+
+        }
+
 
         var formData = {
             "data": JSON.stringify(data)
@@ -135,6 +171,8 @@ $(window).on("load", function () {
     var modForm = $("#modifierForm");
     var selectedMods = [];
     modForm.submit(function (event) {
+            // Enable the add button now that there has been a search
+            $('#addModBtn').attr("disabled", false);
 
             // stop the form from submitting the normal way and refreshing the page
             event.preventDefault();
@@ -159,7 +197,6 @@ $(window).on("load", function () {
             // show spinner
 //            document.getElementById("overlay").style.display = "block";
 
-            // TODO: do backend search
             // process the modifier form
             $.ajax({
                 type: 'GET',
@@ -176,7 +213,6 @@ $(window).on("load", function () {
                 alert("request failed: " + textStatus);
             })
             .done(function (data) {
-                console.log(data);
                 var table = $('#modTable').DataTable({
                     searching: false,
                     lengthMenu: [ 5, 10, 25],
@@ -205,29 +241,36 @@ $(window).on("load", function () {
                 document.getElementById("overlay").style.display = "none";
 
                 // Handle form submission event
-               $('#addModBtn').on('click', function(e){
+                // the "unbind" is prob not officially correct, but the function/click listener was
+                // getting bound each time, so multiple submissions were happening.
+               $('#addModBtn').unbind('click').on('click', function(e){
                   var form = this;
                   var selectedMods = [];
 
                   var rows_selected = table.column(0).checkboxes.selected();
 
-                  // Iterate over all selected checkboxes
+                  // Iterate over all selected checkboxes to gather the selections
                   $.each(rows_selected, function(index, rowId){
                      // Create a hidden element
                      selectedMods.push(
-                         rowId
+                         data[rowId][1]
                      );
                   });
+                  // Create the row and add it
                   var modId = "mod" + nMods;
                   var argInitName = "custom_" + nMods;
-                  addSVORow("svoTable", modId, "custom", argInitName, "with")
+                  addSVORow("svoTable", modId, "custom", argInitName, selectedMods.join());
+
+                  // Disable the add button again until there has been another search
+                  $('#addModBtn').attr("disabled", true);
+                  // Increment the number of mods so each has a unique name/id
                   nMods += 1;
+
                });
             });
 
 
     });
-
 
 // --------------------------------------------------------------------------------------------------------
 //                               RULE BUILDING TABLE FORMATTING METHODS
@@ -248,12 +291,13 @@ $(window).on("load", function () {
      */
     function createSVORowElement(rowPrefix, role, label, constraints) {
         // first 3 columns (role, label, and constraints)
-        var col1Html = "<td> <p> " + role + "</p> </td>";
-        var col2Html = '<td> <p> <input type="text" id="' + rowPrefix + 'Label" placeholder="' + label + '"> </p> </td>';
-        var col3Html = '<td> <p> <input type="text" id="' + rowPrefix + 'Words" value="' + constraints + '"> </p> </td>';
+        var col1Html = "<td> " + role + "</td>";
+        var col2Html = '<td> <input type="text" id="' + rowPrefix + 'Label" placeholder="' + label + '"> </td>';
+        var col3Html = '<td> <input type="text" id="' + rowPrefix + 'Words" value="' + constraints + '"> </td>';
         // radio buttons
         var col4Html = '<td> <input type="radio" name="' + rowPrefix + 'Radio" value="required" checked> </td>';
         var col5Html = '<td> <input type="radio" name="' + rowPrefix + 'Radio" value="optional">  </td>';
+        // hidden unless hovered delete icon
         var col6Html = '<td class="tight-left"> <button type="button" class="delete"></button> </td>';
 
         var rowFragment = document.createElement('tr');
