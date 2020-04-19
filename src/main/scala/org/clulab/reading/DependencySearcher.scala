@@ -3,7 +3,7 @@ package org.clulab.reading
 import ai.lum.common.ConfigUtils._
 import ai.lum.common.ConfigFactory
 import org.clulab.embeddings.word2vec.Word2Vec
-import utils.MakeNmodEmbeddings.asTokens
+import DependencySearcher._
 
 
 case class DependencySimilarity(dep: String, display: String, score: Double)
@@ -12,8 +12,7 @@ class DependencySearcher {
   val nmodW2V = new Word2Vec(config[String]("nmodVectors"))
 
   def mostSimilar(s: String, n: Int = 25): Seq[DependencySimilarity] = {
-    // Sieve -- check nmod first
-
+    // TODO: Sieve -- check nmod first?
     mostSimilarNmod(s, n)
   }
 
@@ -21,10 +20,32 @@ class DependencySearcher {
   def mostSimilarNmod(s: String, n: Int): Seq[DependencySimilarity] = {
     val query = nmod(s)
     nmodW2V.mostSimilarWords(query, n)
-      .map(result => DependencySimilarity(result._1, display(result._1), result._2))
+      .map(result => DependencySimilarity(result._1, asPhrase(result._1), result._2))
   }
 
-  def nmod(s: String): String = s"nmod_${s.replace(" ", "_")}"
-  def display(s: String): String = asTokens(s).mkString(" ")
+}
 
+object DependencySearcher {
+  /**
+   * Convert a phrase (can be multi-word) string into the corresponding nmod dependency.
+   * For example: "in front of" => "nmod_in_front_of"
+   * @param s phrase to be converted
+   * @return nmod representation
+   */
+  def nmod(s: String): String = s"nmod_${s.replace(" ", "_")}"
+
+  /**
+   * Convert an nmod dependency into the tokens that it consists of, minus the "nmod"
+   * @param nmod
+   * @return
+   */
+  def asTokens(nmod: String): Seq[String] = nmod.split("[:_]").slice(1,100)
+
+  /**
+   * Make a display-worthy representation of an nmod -- strip the "nmod" and
+   * replace underscores with spaces
+   * @param nmod
+   * @return
+   */
+  def asPhrase(nmod: String): String = asTokens(nmod).mkString(" ")
 }

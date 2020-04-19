@@ -10,7 +10,8 @@ object RuleVariants {
   def declarative(
     subj: Option[ArgInfo],
     verb: Option[ArgInfo],
-    obj: Option[ArgInfo]
+    obj: Option[ArgInfo],
+    mods: Seq[ArgInfo]
   ): String = {
     // The verb needs to be defined for SVO currently
     assert(verb.isDefined)
@@ -26,6 +27,11 @@ object RuleVariants {
     obj foreach { o =>
       ruleElems.append(mkArg(o.label, DOBJ_DEPS, o.constraintString, o.optional))
     }
+    // Add any extra modifiers
+    mods foreach { m =>
+      ruleElems.append(mkArg(m.label, m.path, m.constraintString, m.optional))
+    }
+
     // Unnecessary, but useful for debug
     val assembledRule: String = ruleElems.mkString("\n")
     println(assembledRule)
@@ -39,9 +45,9 @@ object RuleVariants {
   // -------------------------------------------------------------------------
 
   def mkTrigger(tokenConstraint: String): String =  s"""trigger = ${tokenConstraint}"""
-  def mkArg(label: String, deps: String, tokenConstraint: String, optional: Boolean): String = {
+  def mkArg(label: String, path: String, tokenConstraint: String, optional: Boolean): String = {
     val optChar = if (optional) "?" else ""
-    s"""$label$optChar = $deps ${tokenConstraint}"""
+    s"""$label$optChar = $path ${tokenConstraint}"""
   }
 
 }

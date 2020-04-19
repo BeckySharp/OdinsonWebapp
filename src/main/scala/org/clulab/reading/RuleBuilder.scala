@@ -1,11 +1,13 @@
 package org.clulab.reading
 
+import ai.lum.common.StringUtils._
 import ai.lum.odinson.Rule
 import ujson.Value
 import org.clulab.reading.RuleVariants._
+import org.clulab.reading.DependencySearcher.nmod
 
 
-case class ArgInfo(label: String, constraints: Seq[Constraint], optional: Boolean) {
+case class ArgInfo(label: String, constraints: Seq[Constraint], optional: Boolean, path: String = "") {
   def constraintString: String = {
     s"[${constraints.map(c => c.str).mkString(" & ")}]"
   }
@@ -32,12 +34,15 @@ class RuleBuilder {
     val ruleData = ruleInfo.obj
     println(ruleData)
     val ruleName = getRuleName(ruleData.get("ruleName"))
+    // todo: handle if S/V/O missing
     val subjectArg = mkArgInfo(ruleData.get("subj"))
     val verbArg = mkArgInfo(ruleData.get("verb"))
     val objArg = mkArgInfo(ruleData.get("obj"))
 
     // todo: modifiers
-    val rules = combineArgs(ruleName, subjectArg, verbArg, objArg)
+    val mods = getNModArgs(ruleData.get("mods"))
+
+    val rules = combineArgs(ruleName, subjectArg, verbArg, objArg, mods)
 
     rules
   }
@@ -50,9 +55,36 @@ class RuleBuilder {
     }
   }
 
+  // If there were any nmod arguments passed in, convert them to ArgInfos, with a `path` made from the words
+  private def getNModArgs(args: Option[Value]): Seq[ArgInfo] = {
+    def getNmodArg(arg: Value): ArgInfo = {
+      val label = arg("label").str
+      val words = arg("words").str
+      // convert the words to an nmod path
+      // Split on comma to get each selected option
+      val nmodOptions = words.split(",")
+        // convert each to the corresponding nmod dependency
+        .map(nmod)
+        // make each outgoing
+        // todo: always outgoing?
+        .map(n => s">$n")
+        // make the regex for the options
+        .mkString(" | ")
+      val path = s"($nmodOptions)"
+      val constraints = mkConstraints("") // pass an empty string so that the constraints are a [] wildcard
+      val optional = arg("argType").str == "optional"
+      ArgInfo(label, constraints, optional, path)
+    }
+
+    if (args.isDefined) {
+      args.get.arr.map(getNmodArg)
+    } else {
+      Seq()
+    }
+  }
+
+
   private def mkArgInfo(arg: Option[Value]): Option[ArgInfo] = {
-    println("************")
-    println(arg)
     if (arg.isDefined) {
       val label = arg.get("label").str
       // todo -- convert to constraints
@@ -80,9 +112,15 @@ class RuleBuilder {
     Seq(constraint)
   }
 
-  private def combineArgs(ruleName: String, subj: Option[ArgInfo], verb: Option[ArgInfo], obj: Option[ArgInfo]): Seq[Rule] = {
-
-    val declarativeRule = Rule(s"$ruleName-decl", None, "event", declarative(subj, verb, obj))
+  private def combineArgs(
+    ruleName: String,
+    subj: Option[ArgInfo],
+    verb: Option[ArgInfo],
+    obj: Option[ArgInfo],
+    mods: Seq[ArgInfo]
+  ): Seq[Rule] = {
+    // todo: use mods
+    val declarativeRule = Rule(s"$ruleName-decl", None, "event", declarative(subj, verb, obj, mods))
     println(declarativeRule)
     Seq(declarativeRule)
   }

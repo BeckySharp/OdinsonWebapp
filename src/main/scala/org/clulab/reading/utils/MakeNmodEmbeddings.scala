@@ -6,6 +6,7 @@ import ai.lum.common.ConfigUtils._
 import ai.lum.common.TryWithResources.using
 import ai.lum.common.ConfigFactory
 import org.clulab.embeddings.word2vec.Word2Vec
+import org.clulab.reading.DependencySearcher.asTokens
 
 import scala.io.Source
 
@@ -41,7 +42,7 @@ object MakeNmodEmbeddings extends App {
     } yield (dep, emb)
   }
 
-  def asTokens(nmod: String): Seq[String] = nmod.split("[:_]").slice(1,100)
+
 
   // Load the deps vocab for the index
   val config = ConfigFactory.load()
