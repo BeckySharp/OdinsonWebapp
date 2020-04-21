@@ -99,23 +99,27 @@ class CorpusReader(
     val groupByRule = matches.groupBy(_.foundBy).toSeq
     val consolidated = for {
       (foundBy, matchGroup) <- groupByRule
-      // count matches so that we can add them to the consolidator efficiently
-      // Group by that unique identity mentioned above
-      regroupedMatches = matchGroup
-        .groupBy(_.pseudoIdentity)
-        // get the count of how many times this result appeared and all the sentences where it happened
-        // here the length of the values is the count, and we persist all of the evidence even while consolidating
-        .mapValues(vs => (vs.length, vs.map(v => v.evidence)))
-      // consolidate matches
-      consolidator = new Consolidator(proc)
-      (pseudoIdentity, (count, sentences)) <- regroupedMatches.toSeq
-      _ = consolidator.add(pseudoIdentity, count, sentences)
-      // return results
-    } yield (foundBy, consolidator.getMatches)
-    // Rank the consolidated matches
+      consolidatedRanked = consolidateAndRank(matchGroup)
+    } yield (foundBy, consolidatedRanked)
     consolidated
       .toMap
-      .mapValues(rankMatches)
+  }
+
+  def consolidateAndRank(ms: Seq[Match]): Seq[ConsolidatedMatch] = {
+    // count matches so that we can add them to the consolidator efficiently
+    // Group by that unique identity mentioned above
+    val regroupedMatches = ms
+      .groupBy(_.pseudoIdentity)
+      // get the count of how many times this result appeared and all the sentences where it happened
+      // here the length of the values is the count, and we persist all of the evidence even while consolidating
+      .mapValues(vs => (vs.length, vs.map(v => v.evidence)))
+    // consolidate matches
+    val consolidator = new Consolidator(proc)
+    for ((pseudoIdentity, (count, sentences)) <- regroupedMatches.toSeq) {
+      consolidator.add(pseudoIdentity, count, sentences)
+    }
+    // Rank the consolidated matches
+    rankMatches(consolidator.getMatches)
   }
 
   private def getMatches(mentions: Seq[Mention]): Seq[Match] = {

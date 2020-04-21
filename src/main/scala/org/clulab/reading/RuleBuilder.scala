@@ -1,32 +1,26 @@
 package org.clulab.reading
 
-import ai.lum.common.StringUtils._
 import ai.lum.odinson.Rule
 import ujson.Value
 import org.clulab.reading.RuleVariants._
 import org.clulab.reading.DependencySearcher.nmod
-
-
-case class ArgInfo(label: String, constraints: Seq[Constraint], optional: Boolean, path: String = "") {
-  def constraintString: String = {
-    s"[${constraints.map(c => c.str).mkString(" & ")}]"
-  }
-}
-
-trait Constraint {
-  def str: String
-}
-case class TokenConstraint(field: String, value: String, negated: Boolean = false) extends Constraint {
-  def str: String = s"$field=$value"
-}
-case class EmptyConstraint() extends Constraint {
-  def str: String = ""
-}
-
+import org.clulab.utils.StringUtils.porterStem
+import org.clulab.processors.clu.tokenizer.EnglishLemmatizer
+import org.slf4j.{Logger, LoggerFactory}
+import RuleBuilder.logger
 
 class RuleBuilder {
 
   lazy val random = scala.util.Random
+  lazy val lemmatizer = new EnglishLemmatizer()
+  // todo: read from config:
+  //  - whether or not to lemmatize subj and obj (default=true)
+  //  - whether or not to "expand" the subj and obj to NP (default=true)
+
+  // todo: what do entitiy rules look like? they're prob not SVO...
+  //  - or maybe they are, but you don't particularly need to keep the results?
+  //  - but they should HAVE to be SVO -- consider model names or drugs such as X...
+  //  - so maybe other templates...?
 
   // While the Odin Engine really needs Extractors, here we produce the rules themselves so that they can
   // be displayed in the "expert" version of the webapp for editing
@@ -35,14 +29,23 @@ class RuleBuilder {
     println(ruleData)
     val ruleName = getRuleName(ruleData.get("ruleName"))
     // todo: handle if S/V/O missing
-    val subjectArg = mkArgInfo(ruleData.get("subj"))
-    val verbArg = mkArgInfo(ruleData.get("verb"))
-    val objArg = mkArgInfo(ruleData.get("obj"))
+    // todo: should we stem the subj?
+    val subjectArg = mkArgInfo(ruleData.get("subj"), lemmatize = true)
+    // Here we stem the verb to get the different formulations
+    val verbArg = mkArgInfo(ruleData.get("verb"), stem = true)
+    // todo: should we stem the obj?
+    val objArg = mkArgInfo(ruleData.get("obj"), lemmatize = true)
 
-    // todo: modifiers
+    // Create arguments from any given nmod modifiers
+    // todo: handle other args!
     val mods = getNModArgs(ruleData.get("mods"))
 
     val rules = combineArgs(ruleName, subjectArg, verbArg, objArg, mods)
+
+    // Debug display for dev work
+    println("******************")
+    println(RuleBuilder.displayRules(rules))
+    println("******************")
 
     rules
   }
@@ -53,6 +56,51 @@ class RuleBuilder {
     } else {
       s"rule-${random.nextString(10)}"
     }
+  }
+
+
+  private def mkArgInfo(arg: Option[Value], lemmatize: Boolean = false, stem: Boolean = false): Option[ArgInfo] = {
+    if (arg.isDefined) {
+      val label = arg.get("label").str
+      // todo -- convert to constraints
+      val words = arg.get("words").str
+      val constraints = mkLexicalConstraints(words, lemmatize, stem)
+      // todo: convert to optional
+      val optional = arg.get("argType").str == "optional"
+      return Some(ArgInfo(label, constraints, optional))
+    }
+
+    None
+  }
+
+  private def mkLexicalConstraints(w: String, lemmatize: Boolean, stem: Boolean): Seq[Constraint] = {
+    if (lemmatize && stem) {
+      logger.warn("Both lemmatization and stemming are selected, this is likely to be inefficient and may not produce what you're expecting...")
+    }
+    // If there are no constraints, should be a wildcard
+    if (w == "") return Seq(EmptyConstraint())
+
+    val elements = w.split(",")
+      .map(s => s.trim)
+      .map(s => maybeLemmatize(lemmatize, s))
+      .map(s => maybeStem(stem, s))
+    // TODO: check for NER
+
+    val field = if(lemmatize) "lemma" else "norm"
+    val value = s"""/${elements.mkString("|")}/"""
+    val wordConstraint = TokenConstraint(field, value)
+    // todo: assert that there should only be one of each type of constraint
+    Seq(wordConstraint)
+  }
+
+  private def maybeLemmatize(lemmatize: Boolean, s: String): String = {
+    if (!lemmatize) return s
+    lemmatizer.lemmatizeWord(s)
+  }
+
+  private def maybeStem(stem: Boolean, s: String): String = {
+    if (!stem) return s
+    s"""${porterStem(s)}.*"""
   }
 
   // If there were any nmod arguments passed in, convert them to ArgInfos, with a `path` made from the words
@@ -71,7 +119,7 @@ class RuleBuilder {
         // make the regex for the options
         .mkString(" | ")
       val path = s"($nmodOptions)"
-      val constraints = mkConstraints("") // pass an empty string so that the constraints are a [] wildcard
+      val constraints = mkLexicalConstraints("", lemmatize=false, stem = false) // pass an empty string so that the constraints are a [] wildcard
       val optional = arg("argType").str == "optional"
       ArgInfo(label, constraints, optional, path)
     }
@@ -83,35 +131,6 @@ class RuleBuilder {
     }
   }
 
-
-  private def mkArgInfo(arg: Option[Value]): Option[ArgInfo] = {
-    if (arg.isDefined) {
-      val label = arg.get("label").str
-      // todo -- convert to constraints
-      val words = arg.get("words").str
-      val constraints = mkConstraints(words)
-      // todo: convert to optional
-      val optional = arg.get("argType").str == "optional"
-      return Some(ArgInfo(label, constraints, optional))
-    }
-
-    None
-  }
-
-  private def mkConstraints(w: String): Seq[Constraint] = {
-    // If there are no constraints, should be a wildcard
-    if (w == "") return Seq(EmptyConstraint())
-
-    val elements = w.split(",").map(_.trim)
-    // TODO: check for NER
-    // For now, only handle words, use norm field and, join with OR
-    val field = "norm"
-    val value = s"""/${elements.mkString("|")}/"""
-    val constraint = TokenConstraint(field, value)
-    // todo: assert that there should only be one of each type of constraint
-    Seq(constraint)
-  }
-
   private def combineArgs(
     ruleName: String,
     subj: Option[ArgInfo],
@@ -121,8 +140,11 @@ class RuleBuilder {
   ): Seq[Rule] = {
     // todo: use mods
     val declarativeRule = Rule(s"$ruleName-decl", None, "event", declarative(subj, verb, obj, mods))
-    println(declarativeRule)
-    Seq(declarativeRule)
+    val passiveRule = Rule(s"$ruleName-passive", None, "event", passive(subj, verb, obj, mods))
+    val prepNominalizationRule = Rule(s"$ruleName-prepNominalization", None, "event", prepositionalNominalization(subj, verb, obj, mods))
+
+    Seq(declarativeRule, passiveRule, prepNominalizationRule)
+//    Seq(prepNominalizationRule)
   }
 
 
@@ -130,5 +152,8 @@ class RuleBuilder {
 }
 
 object RuleBuilder {
-
+  lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  def displayRules(rr: Seq[Rule]): String = {
+   rr.map(_.toString).mkString("\n\n")
+  }
 }

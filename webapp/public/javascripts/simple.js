@@ -118,6 +118,7 @@ $(window).on("load", function () {
             alert("request failed: " + textStatus);
         })
         .done(function (data) {
+//            console.log("data:", data)
             // Display if there are no results
             if (data.length == 0) {
                 $('#tablecaption').text("Rule returned no results.");

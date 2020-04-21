@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 import javax.inject._
+import org.clulab.reading.utils.DisplayUtils
 import org.clulab.reading.{CorpusReader, DependencySearcher, Match, RuleBuilder}
 import play.api.libs.json._
 import play.api.mvc._
@@ -61,13 +62,16 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   def buildRules(data:String) = Action {
     println(data)
+    // todo: making an Obj in two places now... refactor?
     val j = ujson.read(data)
+    val ruleName = j.obj.get("ruleName").map(_.str).getOrElse("NO_NAME")
     val rules = ruleBuilder.buildRules(j)
     val matches = reader.extractMatchesFromRules(rules)
+    val reformatted = DisplayUtils.replaceTriggerName(j, matches)
     // TODO: export if desired
-    val resultsByRule = reader.consolidateMatches(matches)
-    println(s"num results: ${resultsByRule.toSeq.flatMap(_._2).length}")
-    val out = JsonUtils.mkJsonDict(resultsByRule)
+    val results = reader.consolidateAndRank(reformatted)
+    println(s"num results: ${results.length}")
+    val out = JsonUtils.mkJsonDict(Map(ruleName -> results))
     Ok(out)
   }
 
@@ -78,6 +82,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     CorpusReader.writeMatchesTo(matches, outfile)
   }
 
+  // Used to get other nmod suggestions for the modifier panel, given an nmod query
   def getSimilarMods(query: String) = Action {
     val similarNmods = nmodSearcher.mostSimilar(query)
     val json = JsonUtils.mkJsonSimilarities(similarNmods)
