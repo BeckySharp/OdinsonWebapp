@@ -1,6 +1,8 @@
 name := "OdinsonWebapp"
 organization := "org.clulab"
 
+resolvers +=  "Artifactory" at "http://artifactory.cs.arizona.edu:8081/artifactory/sbt-release" // processors-models
+
 libraryDependencies ++= Seq(
   "org.clulab"    %% "processors-main"          % "7.4.4",
   "org.clulab"    %% "processors-corenlp"       % "7.4.4",
