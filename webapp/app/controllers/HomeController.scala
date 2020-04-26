@@ -5,7 +5,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 import javax.inject._
-import org.clulab.reading.{CorpusReader, Match}
+import org.clulab.reading.{CorpusReader, Match, TextReader}
+import org.clulab.reading.CorpusReader.consolidateMatches
 import play.api.mvc._
 
 import scala.util.matching.Regex
@@ -21,6 +22,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   // -------------------------------------------------
   println("CorpusReader is getting started ...")
   val reader = CorpusReader.fromConfig
+  val proc = reader.proc
   println("CorpusReader is ready to go ...")
   // -------------------------------------------------
 
@@ -48,7 +50,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
       val outfile = s"${ruleNameHack(rules)}_${localDateFormat.format(new Date)}.jsonl"
       CorpusReader.writeMatchesTo(matches, outfile)
     }
-    val resultsByRule = reader.consolidateMatches(matches)
+    val resultsByRule = consolidateMatches(matches, reader.proc)
     println(s"num results: ${resultsByRule.toSeq.flatMap(_._2).length}")
     val json = JsonUtils.mkJsonDict(resultsByRule)
 //    println(Json.prettyPrint(json))
@@ -69,6 +71,20 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     println(s"saved rules to $filename")
 
     val json = JsonUtils.mkJsonDict(Map.empty)
+    Ok(json)
+  }
+
+
+  def processText: Action[AnyContent] = Action { request =>
+    val data = request.body.asJson.get.toString()
+    val j = ujson.read(data)
+    val rules = j("ruleFile").str
+    val textFile = j("textfile").str
+    val textReader = TextReader.fromFile(proc, textFile)
+    val matches = textReader.extractMatches(rules)
+    val resultsByRule = consolidateMatches(matches, proc)
+    println(s"num results from provided file: ${resultsByRule.toSeq.flatMap(_._2).length}")
+    val json = JsonUtils.mkJsonDict(resultsByRule)
     Ok(json)
   }
 
