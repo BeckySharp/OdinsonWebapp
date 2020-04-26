@@ -1,11 +1,13 @@
 name := "OdinsonWebapp"
 organization := "org.clulab"
 
+resolvers +=  "Artifactory" at "http://artifactory.cs.arizona.edu:8081/artifactory/sbt-release" // processors-models
+
+val procVer = "8.0.2"
+
 libraryDependencies ++= Seq(
-  "org.clulab"    %% "processors-main"          % "7.4.4",
-  "org.clulab"    %% "processors-corenlp"       % "7.4.4",
-  "org.clulab"    %% "processors-modelsmain"    % "7.4.4",
-  "org.clulab"    %% "processors-modelscorenlp" % "7.4.4",
+  "org.clulab"    %% "processors-main"          % procVer,
+  "org.clulab"    %% "processors-corenlp"       % procVer,
   "ai.lum"        %% "odinson-core"             % "0.2.3",
   "ai.lum"        %% "common"                   % "0.0.10",
   "com.lihaoyi"   %% "ujson"                    % "0.7.1",
