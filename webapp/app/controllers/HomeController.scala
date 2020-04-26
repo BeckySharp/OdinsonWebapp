@@ -6,7 +6,7 @@ import java.util.Date
 
 import javax.inject._
 import org.clulab.reading.{CorpusReader, Match, TextReader}
-import org.clulab.reading.CorpusReader.consolidateMatches
+import org.clulab.reading.CorpusReader._
 import play.api.mvc._
 
 import scala.util.matching.Regex
@@ -82,10 +82,8 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val textFile = j("textfile").str
     val textReader = TextReader.fromFile(proc, textFile)
     val matches = textReader.extractMatches(rules)
-    val resultsByRule = consolidateMatches(matches, proc)
-    println(s"num results from provided file: ${resultsByRule.toSeq.flatMap(_._2).length}")
-    val json = JsonUtils.mkJsonDict(resultsByRule)
-    Ok(json)
+    val jsonMatches = JsonUtils.asJsonArray(matchesAsJsonStrings(matches))
+    Ok(jsonMatches)
   }
 
 }

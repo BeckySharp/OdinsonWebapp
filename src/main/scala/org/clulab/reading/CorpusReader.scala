@@ -51,6 +51,10 @@ object CorpusReader {
     pw.close()
   }
 
+  def matchesAsJsonStrings(ms: Seq[Match]): Seq[String] = {
+    ms.map(m => write(m))
+  }
+
   /**
    * Consolidate results by rule and return the consolidated Matches, persisting
    * all evidence for downstream users.
