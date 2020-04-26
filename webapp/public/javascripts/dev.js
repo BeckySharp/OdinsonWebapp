@@ -1,4 +1,6 @@
 
+
+
 /* Formatting function for row details - here the evidence */
 function format ( d ) {
 // `d` is the original data object for the row
@@ -83,7 +85,7 @@ function mkColumnDefs(arguments) {
     return columnDefs;
 }
 
-
+tableIndex = 0;
 
 
 $(document).ready(function () {
@@ -165,6 +167,7 @@ $(document).ready(function () {
         // stop the form from submitting the normal way and refreshing the page
         event.preventDefault();
 
+
         // collect form data
         var rules = $('#rules').val();
         var formData = {
@@ -177,14 +180,21 @@ $(document).ready(function () {
             return;
         }
 
-        if ($.fn.DataTable.isDataTable('#results')) {
-            $('#results').DataTable().clear().destroy();
-            // to handle the fact that the thead remnants stay around:
-            // ref: https://datatables.net/forums/discussion/20524/destroy-issue
-            $('#results').empty();
-            $('#results').html('<caption id="tablecaption"></caption>');
-        }
+        for (let i = 0; i < tableIndex; i++) {
+            var tableId = 'ruleTable' + i;
+            var tableIdJQuery = '#'+tableId;
+            if ($.fn.DataTable.isDataTable(tableIdJQuery)) {
+                $(tableIdJQuery).DataTable().clear().destroy();
+                // to handle the fact that the thead remnants stay around:
+                // ref: https://datatables.net/forums/discussion/20524/destroy-issue
+                $(tableIdJQuery).empty();
+//                $(tableId).html('<caption id="'+tableId+'Caption"></caption>');
+            }
+            var old = document.getElementById(tableId);
+            old.parentNode.removeChild(old);
 
+        }
+        tableIndex = 0;
 
         // show spinner
         document.getElementById("overlay").style.display = "block";
@@ -209,14 +219,19 @@ $(document).ready(function () {
             if (data.length == 0) {
                 $('#tablecaption').text("Rule returned no results.");
             }
-            for (let i = 0; i < data.length; i++) {
+            var numRules = data.length;
+            for (let i = 0; i < numRules; i++) {
                 var ruleData = ruleDisplay(data[i])
                 var arguments = ruleData[0]
                 var nArgs = arguments.length
                 var ruleRows = ruleData[1]
                 var ruleName = ruleData[2]
+                addTable(tableIndex);
+                tableIndex += 1;
+                //console.log("After adding, tableIndex=", tableIndex);
                 $('#tablecaption').text(ruleName);
-                $('#results').DataTable({
+                $('#ruleTableCaption'+i).text(ruleName);
+                $('#ruleTable'+i).DataTable({
                     colReorder: true,
                     destroy: true,
                     data: ruleRows,
@@ -250,4 +265,17 @@ $(document).ready(function () {
         }
     } );
 
+
+
 });
+
+function addTable (i) {
+    var newTable = document.createElement("table");
+    newTable.setAttribute("id", "ruleTable"+i);
+    newTable.setAttribute("class", "display dev");
+    newTable.setAttribute("width", "100%");
+    var caption = newTable.createCaption();
+    caption.setAttribute("id", "ruleTableCaption"+i)
+    document.body.appendChild(newTable);
+
+}
