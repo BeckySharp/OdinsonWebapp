@@ -119,8 +119,13 @@ $(document).ready(function () {
                 $('#saveRulesBtn').on('click', async function(e){
 
                   const { value: ruleFileName } = await Swal.fire({
-                    title: 'Where do you want to save?',
+                    title: 'Where do you want to save the rules file?',
+                    text: 'NOTE: you must have already submitted your ' +
+                          'query in order for the rules to save properly! \n',
                     input: 'text',
+                    icon: 'question',
+                    width: '40rem',
+                    confirmButtonText: "Save",
                     inputValue: "rules.yml",
                     showCancelButton: true,
                     inputValidator: (value) => {
@@ -130,8 +135,8 @@ $(document).ready(function () {
                     }
                   })
 
-                   console.log("ruleFileName:", ruleFileName);
                   if (ruleFileName) {
+                    var rulesObj = document.getElementById('rules');
                     var rules = $('#rules').val();
                     var rulesData = {
                         'rules': rules,
@@ -188,7 +193,6 @@ $(document).ready(function () {
                 // to handle the fact that the thead remnants stay around:
                 // ref: https://datatables.net/forums/discussion/20524/destroy-issue
                 $(tableIdJQuery).empty();
-//                $(tableId).html('<caption id="'+tableId+'Caption"></caption>');
             }
             var old = document.getElementById(tableId);
             old.parentNode.removeChild(old);
@@ -228,7 +232,6 @@ $(document).ready(function () {
                 var ruleName = ruleData[2]
                 addTable(tableIndex);
                 tableIndex += 1;
-                //console.log("After adding, tableIndex=", tableIndex);
                 $('#tablecaption').text(ruleName);
                 $('#ruleTableCaption'+i).text(ruleName);
                 $('#ruleTable'+i).DataTable({
@@ -251,7 +254,8 @@ $(document).ready(function () {
     // Add event listener for opening and closing (evidence) details
     $(document).on('click', 'td.details-control', function () {
         var tr = $(this).closest('tr');
-        var row = $('#results').DataTable().row( tr );
+        var tab = $(this).closest('table');
+        var row = tab.DataTable().row( tr );
 
         if ( row.child.isShown() ) {
             // This row is already open - close it
