@@ -5,6 +5,7 @@ import java.io.PrintWriter
 import ai.lum.common.ConfigUtils._
 import ai.lum.common.ConfigFactory
 import ai.lum.odinson._
+import org.clulab.processors.Processor
 import org.clulab.processors.fastnlp.FastNLPProcessor
 import ujson.Value
 import upickle.default._
@@ -49,6 +50,42 @@ object CorpusReader {
     pw.flush()
     pw.close()
   }
+
+  /**
+   * Consolidate results by rule and return the consolidated Matches, persisting
+   * all evidence for downstream users.
+   * @param matches
+   * @return Map with consolidated matches (i.e., "deduplicated") for each rule (key)
+   */
+  def consolidateMatches(matches: Seq[Match], proc: Processor): Map[String, Seq[ConsolidatedMatch]] = {
+    // Each rule may have different args and different numbers of args, so we'll need to display
+    // them separately.
+    val groupByRule = matches.groupBy(_.foundBy).toSeq
+    val consolidated = for {
+      (foundBy, matchGroup) <- groupByRule
+      // count matches so that we can add them to the consolidator efficiently
+      // Group by that unique identity mentioned above
+      regroupedMatches = matchGroup
+        .groupBy(_.pseudoIdentity)
+        // get the count of how many times this result appeared and all the sentences where it happened
+        // here the length of the values is the count, and we persist all of the evidence even while consolidating
+        .mapValues(vs => (vs.length, vs.map(v => v.evidence)))
+      // consolidate matches
+      consolidator = new Consolidator(proc)
+      (pseudoIdentity, (count, sentences)) <- regroupedMatches.toSeq
+      _ = consolidator.add(pseudoIdentity, count, sentences)
+      // return results
+    } yield (foundBy, consolidator.getMatches)
+    // Rank the consolidated matches
+    consolidated
+      .toMap
+      .mapValues(rankMatches)
+  }
+
+  private def rankMatches(matches: Seq[ConsolidatedMatch]): Seq[ConsolidatedMatch] = {
+    matches.sortBy(-_.count)
+  }
+
 }
 
 class CorpusReader(
@@ -82,37 +119,6 @@ class CorpusReader(
     getMatches(mentions)
   }
 
-  /**
-   * Consolidate results by rule and return the consolidated Matches, persisting
-   * all evidence for downstream users.
-   * @param matches
-   * @return Map with consolidated matches (i.e., "deduplicated") for each rule (key)
-   */
-  def consolidateMatches(matches: Seq[Match]): Map[String, Seq[ConsolidatedMatch]] = {
-    // Each rule may have different args and different numbers of args, so we'll need to display
-    // them separately.
-    val groupByRule = matches.groupBy(_.foundBy).toSeq
-    val consolidated = for {
-      (foundBy, matchGroup) <- groupByRule
-      // count matches so that we can add them to the consolidator efficiently
-      // Group by that unique identity mentioned above
-      regroupedMatches = matchGroup
-        .groupBy(_.pseudoIdentity)
-        // get the count of how many times this result appeared and all the sentences where it happened
-        // here the length of the values is the count, and we persist all of the evidence even while consolidating
-        .mapValues(vs => (vs.length, vs.map(v => v.evidence)))
-      // consolidate matches
-      consolidator = new Consolidator(proc)
-      (pseudoIdentity, (count, sentences)) <- regroupedMatches.toSeq
-      _ = consolidator.add(pseudoIdentity, count, sentences)
-      // return results
-    } yield (foundBy, consolidator.getMatches)
-    // Rank the consolidated matches
-    consolidated
-      .toMap
-      .mapValues(rankMatches)
-  }
-
   private def getMatches(mentions: Seq[Mention]): Seq[Match] = {
     for {
       mention <- mentions
@@ -138,10 +144,6 @@ class CorpusReader(
       case em: EventMatch => Some(NamedCapture("trigger", None, em.trigger))
       case _ => None
     }
-  }
-
-  private def rankMatches(matches: Seq[ConsolidatedMatch]): Seq[ConsolidatedMatch] = {
-    matches.sortBy(-_.count)
   }
 
   private def mkExtractorsFromRules(rules: String): Seq[Extractor] = {
