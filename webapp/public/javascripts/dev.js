@@ -1,3 +1,4 @@
+
 /* Formatting function for row details - here the evidence */
 function format ( d ) {
 // `d` is the original data object for the row
@@ -84,6 +85,7 @@ function mkColumnDefs(arguments) {
 
 
 
+
 $(document).ready(function () {
 
     var code = $(".codemirror-textarea")[0];
@@ -100,16 +102,63 @@ $(document).ready(function () {
                         editor.toggleComment({
                             indent: true
                         });
-//                        editor.execCommand('toggleComment');
                     },
                     "Cmd-/": function(cm){
                         editor.toggleComment({
                             indent: true
                         });
-//                        editor.execCommand('toggleComment');
                     }
                    }
     });
+
+                // Handle rule saving event
+                // the "unbind" is prob not officially correct, but the function/click listener was
+                // getting bound each time, so multiple submissions were happening.
+                $('#saveRulesBtn').on('click', async function(e){
+
+                  const { value: ruleFileName } = await Swal.fire({
+                    title: 'Where do you want to save?',
+                    input: 'text',
+                    inputValue: "rules.yml",
+                    showCancelButton: true,
+                    inputValidator: (value) => {
+                      if (!value) {
+                        return 'You need to write something!'
+                      }
+                    }
+                  })
+
+                   console.log("ruleFileName:", ruleFileName);
+                  if (ruleFileName) {
+                    var rules = $('#rules').val();
+                    var rulesData = {
+                        'rules': rules,
+                        'filename': ruleFileName
+                    }
+
+                    // Actually save the rules
+                    // process the form
+                    $.ajax({
+                        type: 'GET',
+                        url: 'saveRules',
+                        data: rulesData,
+                        dataType: 'json',
+                        encode: true
+                    })
+                    .fail(function (jqXHR, textStatus) {
+                        // hide spinner
+                        document.getElementById("overlay").style.display = "none";
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        alert("request failed: " + textStatus);
+                    })
+                    .done(function (data) {
+                        Swal.fire(`File saved to ${ruleFileName}`)
+                    })
+                  }
+
+               });
+
 
     $('form').submit(function (event) {
 

@@ -1,5 +1,6 @@
 package controllers
 
+import java.io.PrintWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -58,6 +59,17 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val namePattern = """name:\s*([^\s\\]+)""".r
     val m = namePattern.findFirstMatchIn(rules)
     m.get.group(1)
+  }
+
+  def saveRules(rules: String, filename: String) = Action {
+    val pw = new PrintWriter(filename)
+    pw.write(rules)
+    pw.close()
+
+    println(s"saved rules to $filename")
+
+    val json = JsonUtils.mkJsonDict(Map.empty)
+    Ok(json)
   }
 
 }
