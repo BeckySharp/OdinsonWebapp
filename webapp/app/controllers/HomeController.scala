@@ -78,10 +78,10 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def processText: Action[AnyContent] = Action { request =>
     val data = request.body.asJson.get.toString()
     val j = ujson.read(data)
-    val rules = j("ruleFile").str
+    val rules = j("rulefile").str
     val textFile = j("textfile").str
-    val textReader = TextReader.fromFile(proc, textFile)
-    val matches = textReader.extractMatches(rules)
+    val textReader = TextReader.fromFile(proc, rules)
+    val matches = textReader.extractMatchesFromFile(textFile)
     val jsonMatches = JsonUtils.asJsonArray(matchesAsJsonStrings(matches))
     Ok(jsonMatches)
   }

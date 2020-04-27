@@ -9,14 +9,16 @@ import ai.lum.common.ConfigFactory
 import ai.lum.odinson.extra.ProcessorsUtils
 import ai.lum.odinson.{ExtractorEngine, Document => OdinsonDocument}
 import org.clulab.processors.Processor
+import TextReader.fileContents
 
 import scala.io.Source
 
 object TextReader{
+  def fileContents(fn: String): String = using(Source.fromFile(fn)) { f =>
+    f.getLines().mkString("\n")
+  }
   def fromFile(proc: Processor, ruleFile: String): TextReader = {
-    val yml = using(Source.fromFile(ruleFile)) { ff =>
-      ff.getLines().mkString
-    }
+    val yml = fileContents(ruleFile)
     new TextReader(proc, yml)
   }
 }
@@ -25,6 +27,10 @@ class TextReader(val proc: Processor, val rules: String) {
   val config = ConfigFactory.load()
   val numEvidenceDisplay = config.get[Int]("ui.numEvidenceDisplay").getOrElse(3)
   val consolidateByLemma = config.get[Boolean]("ui.lemmaConsolidation").getOrElse(true)
+
+  def extractMatchesFromFile(filename: String): Seq[Match] = {
+    extractMatches(fileContents(filename))
+  }
 
   def extractMatches(text: String): Seq[Match] = {
     val procDoc = proc.annotate(text)
