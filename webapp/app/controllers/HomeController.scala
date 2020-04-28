@@ -79,9 +79,18 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val data = request.body.asJson.get.toString()
     val j = ujson.read(data)
     val rules = j("rulefile").str
-    val textFile = j("textfile").str
     val textReader = TextReader.fromFile(proc, rules)
-    val matches = textReader.extractMatchesFromFile(textFile)
+    assert(!( j.obj.keySet.contains("textfile") && j.obj.keySet.contains("text") ),
+      "You cannot pass both a textfile and text in a single request.")
+    val matches = if (j.obj.get("textfile").isDefined) {
+      val textFile = j("textfile").str
+      textReader.extractMatchesFromFile(textFile)
+    } else if (j.obj.get("text").isDefined) {
+      val text = j("text").str
+      textReader.extractMatches(text)
+    } else {
+      throw new RuntimeException("You must pass either a `textfile` or a `text`")
+    }
     val jsonMatches = JsonUtils.asJsonArray(matchesAsJsonStrings(matches))
     Ok(jsonMatches)
   }
