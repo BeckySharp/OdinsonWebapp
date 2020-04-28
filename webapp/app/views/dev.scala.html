@@ -1,7 +1,6 @@
 <html>
 <head>
     <title>Odinson Rule Development UI</title>
-    <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/jquery.dataTables.min.css"/>
     <link rel="stylesheet" href="assets/plugins/codemirror/lib/codemirror.css">
     <link rel="stylesheet" href="assets/plugins/DataTables/colReorder.css">
@@ -13,7 +12,8 @@
     <script src="assets/plugins/codemirror/addon/edit/closebrackets.js"></script>
     <script src="assets/plugins/codemirror/addon/comment/comment.js"></script>
     <script src="assets/plugins/codemirror/mode/yaml-odinson/yaml-odinson.js"></script>
-<!--    <script src="assets/plugins/codemirror/mode/yaml/yaml.js"></script>-->
+    <script type="text/javascript" src="assets/javascripts/sweetalert.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
     <script type="text/javascript" src="assets/javascripts/dev.js"></script>
 
 
@@ -43,21 +43,20 @@ rules:
        (?<cause> ${chunk}) <nsubj (?<trigger> [lemma=/cause|increase|decrease|affect/]) >dobj (?<effect> ${chunk})
 
     </textarea>
+    <input id="saveRulesBtn" class="submitbutton" type="button" value="SAVE RULES">
+    <br>
+    <br>
     <br>
     <label class="checkbox">
         <input type="checkbox" name="export" />
         <span>export matches</span>
     </label>
     <br>
-<!--    <br>-->
+
     <input class="submitbutton" type="submit" value="SUBMIT">
-<!--    <input type="checkbox" name="export" value="export" class="myradio">export<br>-->
 
 </form>
 <br>
-<table id="results" class="display" width="100%">
-    <caption id="tablecaption"></caption>
-</table>
 
 </body>
 </html>

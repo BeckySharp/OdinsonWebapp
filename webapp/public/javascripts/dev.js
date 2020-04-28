@@ -1,3 +1,6 @@
+
+
+
 /* Formatting function for row details - here the evidence */
 function format ( d ) {
 // `d` is the original data object for the row
@@ -82,6 +85,7 @@ function mkColumnDefs(arguments) {
     return columnDefs;
 }
 
+tableIndex = 0;
 
 
 $(document).ready(function () {
@@ -100,21 +104,74 @@ $(document).ready(function () {
                         editor.toggleComment({
                             indent: true
                         });
-//                        editor.execCommand('toggleComment');
                     },
                     "Cmd-/": function(cm){
                         editor.toggleComment({
                             indent: true
                         });
-//                        editor.execCommand('toggleComment');
                     }
                    }
     });
+
+                // Handle rule saving event
+                // the "unbind" is prob not officially correct, but the function/click listener was
+                // getting bound each time, so multiple submissions were happening.
+                $('#saveRulesBtn').on('click', async function(e){
+
+                  const { value: ruleFileName } = await Swal.fire({
+                    title: 'Where do you want to save the rules file?',
+                    text: 'NOTE: you must have already submitted your ' +
+                          'query in order for the rules to save properly! \n',
+                    input: 'text',
+                    icon: 'question',
+                    width: '40rem',
+                    confirmButtonText: "Save",
+                    inputValue: "rules.yml",
+                    showCancelButton: true,
+                    inputValidator: (value) => {
+                      if (!value) {
+                        return 'You need to write something!'
+                      }
+                    }
+                  })
+
+                  if (ruleFileName) {
+                    var rulesObj = document.getElementById('rules');
+                    var rules = $('#rules').val();
+                    var rulesData = {
+                        'rules': rules,
+                        'filename': ruleFileName
+                    }
+
+                    // Actually save the rules
+                    // process the form
+                    $.ajax({
+                        type: 'GET',
+                        url: 'saveRules',
+                        data: rulesData,
+                        dataType: 'json',
+                        encode: true
+                    })
+                    .fail(function (jqXHR, textStatus) {
+                        // hide spinner
+                        document.getElementById("overlay").style.display = "none";
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        alert("request failed: " + textStatus);
+                    })
+                    .done(function (data) {
+                        Swal.fire(`File saved to ${ruleFileName}`)
+                    })
+                  }
+
+               });
+
 
     $('form').submit(function (event) {
 
         // stop the form from submitting the normal way and refreshing the page
         event.preventDefault();
+
 
         // collect form data
         var rules = $('#rules').val();
@@ -128,14 +185,20 @@ $(document).ready(function () {
             return;
         }
 
-        if ($.fn.DataTable.isDataTable('#results')) {
-            $('#results').DataTable().clear().destroy();
-            // to handle the fact that the thead remnants stay around:
-            // ref: https://datatables.net/forums/discussion/20524/destroy-issue
-            $('#results').empty();
-            $('#results').html('<caption id="tablecaption"></caption>');
-        }
+        for (let i = 0; i < tableIndex; i++) {
+            var tableId = 'ruleTable' + i;
+            var tableIdJQuery = '#'+tableId;
+            if ($.fn.DataTable.isDataTable(tableIdJQuery)) {
+                $(tableIdJQuery).DataTable().clear().destroy();
+                // to handle the fact that the thead remnants stay around:
+                // ref: https://datatables.net/forums/discussion/20524/destroy-issue
+                $(tableIdJQuery).empty();
+            }
+            var old = document.getElementById(tableId);
+            old.parentNode.removeChild(old);
 
+        }
+        tableIndex = 0;
 
         // show spinner
         document.getElementById("overlay").style.display = "block";
@@ -160,14 +223,18 @@ $(document).ready(function () {
             if (data.length == 0) {
                 $('#tablecaption').text("Rule returned no results.");
             }
-            for (let i = 0; i < data.length; i++) {
+            var numRules = data.length;
+            for (let i = 0; i < numRules; i++) {
                 var ruleData = ruleDisplay(data[i])
                 var arguments = ruleData[0]
                 var nArgs = arguments.length
                 var ruleRows = ruleData[1]
                 var ruleName = ruleData[2]
+                addTable(tableIndex);
+                tableIndex += 1;
                 $('#tablecaption').text(ruleName);
-                $('#results').DataTable({
+                $('#ruleTableCaption'+i).text(ruleName);
+                $('#ruleTable'+i).DataTable({
                     colReorder: true,
                     destroy: true,
                     data: ruleRows,
@@ -187,7 +254,8 @@ $(document).ready(function () {
     // Add event listener for opening and closing (evidence) details
     $(document).on('click', 'td.details-control', function () {
         var tr = $(this).closest('tr');
-        var row = $('#results').DataTable().row( tr );
+        var tab = $(this).closest('table');
+        var row = tab.DataTable().row( tr );
 
         if ( row.child.isShown() ) {
             // This row is already open - close it
@@ -201,4 +269,17 @@ $(document).ready(function () {
         }
     } );
 
+
+
 });
+
+function addTable (i) {
+    var newTable = document.createElement("table");
+    newTable.setAttribute("id", "ruleTable"+i);
+    newTable.setAttribute("class", "display dev");
+    newTable.setAttribute("width", "100%");
+    var caption = newTable.createCaption();
+    caption.setAttribute("id", "ruleTableCaption"+i)
+    document.body.appendChild(newTable);
+
+}

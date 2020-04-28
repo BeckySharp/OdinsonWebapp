@@ -1,8 +1,9 @@
 :root {
   /*--odinson-dk-blue: #1352B9;*/
   --odinson-dk-blue: #255497;
+  --odinson-lt-gray: #DFDFDF;
+  --odinson-hover-blue: #DBE2EC;
 }
-
 
 body {
     font-family: Arial, Helvetica, sans-serif;
@@ -19,9 +20,57 @@ table, th,td {
     font-size: inherit;
 }
 
-th {
+table.svo {
+    border: 0px solid black;
+    font-size: inherit;
+}
+
+
+.display th {
   background-color: var(--odinson-dk-blue);
   color: white;
+}
+
+.svo td,th {
+    border: 0px solid black;
+    font-weight: normal;
+}
+
+
+.svo .pad td.tight-left {
+    padding-left: 4px;
+    margin-left: 0px;
+    border: 0px solid #043D8F    ;
+}
+
+
+.svo .pad td {
+    padding-left: 10pt;
+    padding-right: 4pt;
+    padding-bottom: 14pt;
+}
+
+
+.pad-top th {
+    padding-top: 10pt;
+    padding-bottom: 5pt;
+    text-align: center;
+}
+
+tr > td:last-child > button {visibility:hidden;}
+tr:hover > td:last-child > button {visibility:visible;}
+
+.svo input {
+    border: 1px solid var(--odinson-lt-gray);
+    border-radius: 10px;
+    padding: 2px;
+    text-align: center;
+    background-color: #F2F3F5;
+}
+
+
+.svo input:hover{
+    background-color: var(--odinson-hover-blue);
 }
 
 h1 {
@@ -30,9 +79,15 @@ h1 {
 }
 
 h2 {
+    font-size: 120%;
+    color: #2471A3;
+}
+
+h3 {
     font-size: 110%;
     color: #2471A3;
 }
+
 
 textarea {
     font-size: inherit;
@@ -40,20 +95,29 @@ textarea {
 
 /* for the form submit button style */
 .submitbutton
-{
-padding: 4px 18px 4px !important;
-font-size: 11px;
-background-color: #ffffff;
-font-weight: bold;
-color: var(--odinson-dk-blue);
-border-radius: 80px;
--moz-border-radius: 80px;
--webkit-border-radius: 80px;
-border: 1px solid var(--odinson-dk-blue);
-cursor: pointer;
-outline: none;
+ {
+ background-color: #ffffff;
+ font-weight: bold;
+ color: var(--odinson-dk-blue);
+ border-radius: 80px;
+ -moz-border-radius: 80px;
+ -webkit-border-radius: 80px;
+ border: 1px solid var(--odinson-dk-blue);
+ cursor: pointer;
+ outline: none;
 
-}
+ }
+
+ .submitbutton.main {
+ padding: 4px 18px 4px !important;
+  font-size: 11px;
+ }
+
+ .submitbutton.sm
+ {
+ padding: 3px 10px 3px !important;
+ font-size: 10px;
+ }
 
 .submitbutton:hover
 {
@@ -91,6 +155,15 @@ outline: none;
     -ms-transform: translate(-50%,-50%);
 }
 
+button.delete {
+    height: 18px;
+    width: 18px;
+    background: url('/assets/images/trash.svg') no-repeat left center;
+    cursor: pointer;
+    border: 0px;
+}
+
+
 td.details-control {
     background: url('/assets/images/plus.svg') no-repeat center center;
     cursor: pointer;
@@ -98,7 +171,7 @@ td.details-control {
 tr.shown td.details-control {
     background: url('/assets/images/minus.svg') no-repeat center center;
 }
-caption {
+.dev caption {
   text-align: center;
   color: var(--odinson-dk-blue);
   background: #C9D6EB ;
@@ -110,6 +183,8 @@ caption {
 tr.grey td {
     background: #C9D6EB ;
 }
+
+
 
 
 /* for the checkbox style */
@@ -157,4 +232,25 @@ tr.grey td {
 
 .checkbox > input:active {
     border: 2px solid var(--odinson-dk-blue);
+}
+
+.swal2-popup{
+    font-size: 10pt !important;
+    width: 22em;
+}
+
+.swal2-title {
+    font-size: 16pt;
+}
+
+.swal2-styled {
+    padding-top: 0.425em;
+    padding-right: 1em;
+    padding-bottom: 0.425em;
+    padding-left: 1em;
+}
+
+.swal2-icon {
+    width: 3.5em;
+    height: 3.5em;
 }

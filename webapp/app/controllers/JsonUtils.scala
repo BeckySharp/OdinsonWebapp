@@ -8,6 +8,8 @@ import play.api.libs.json._
  */
 object JsonUtils {
 
+  def asJsonArray(ss: Seq[String]): JsValue = Json.arr(ss)
+
   def mkJsonDict(ruleResults: Map[String, Seq[ConsolidatedMatch]]): JsValue = {
     Json.arr(ruleResults.toSeq.map(res => mkJsonDict(res._1, res._2)): _*)
   }
