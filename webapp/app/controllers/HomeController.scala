@@ -1,11 +1,13 @@
 package controllers
 
+import java.io.PrintWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 
 import javax.inject._
+import org.clulab.reading.{CorpusReader, DependencySearcher, Match, RuleBuilder, TextReader}
+import org.clulab.reading.CorpusReader._
 import org.clulab.reading.utils.DisplayUtils
-import org.clulab.reading.{CorpusReader, DependencySearcher, Match, RuleBuilder}
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -20,6 +22,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   // -------------------------------------------------
   println("CorpusReader is getting started ...")
   val reader = CorpusReader.fromConfig
+  val proc = reader.proc
   lazy val ruleBuilder = new RuleBuilder()
   lazy val nmodSearcher = new DependencySearcher
   println("CorpusReader is ready to go ...")
@@ -47,7 +50,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     if (exportMatches) {
       exportResults(ruleNameHack(rules), matches)
     }
-    val resultsByRule = reader.consolidateMatches(matches)
+    val resultsByRule = consolidateMatches(matches)
     println(s"num results: ${resultsByRule.toSeq.flatMap(_._2).length}")
     val json = JsonUtils.mkJsonDict(resultsByRule)
 //    println(Json.prettyPrint(json))
@@ -69,7 +72,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val matches = reader.extractMatchesFromRules(rules)
     val reformatted = DisplayUtils.replaceTriggerName(j, matches)
     // TODO: export if desired
-    val results = reader.consolidateAndRank(reformatted)
+    val results = consolidateAndRank(reformatted)
     println(s"num results: ${results.length}")
     val out = JsonUtils.mkJsonDict(Map(ruleName -> results))
     Ok(out)
@@ -87,6 +90,38 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val similarNmods = nmodSearcher.mostSimilar(query)
     val json = JsonUtils.mkJsonSimilarities(similarNmods)
     Ok(json)
+  }
+
+  def saveRules(rules: String, filename: String) = Action {
+    val pw = new PrintWriter(filename)
+    pw.write(rules)
+    pw.close()
+
+    println(s"saved rules to $filename")
+
+    val json = JsonUtils.mkJsonDict(Map.empty)
+    Ok(json)
+  }
+
+
+  def processText: Action[AnyContent] = Action { request =>
+    val data = request.body.asJson.get.toString()
+    val j = ujson.read(data)
+    val rules = j("rulefile").str
+    val textReader = TextReader.fromFile(proc, rules)
+    assert(!( j.obj.keySet.contains("textfile") && j.obj.keySet.contains("text") ),
+      "You cannot pass both a textfile and text in a single request.")
+    val matches = if (j.obj.get("textfile").isDefined) {
+      val textFile = j("textfile").str
+      textReader.extractMatchesFromFile(textFile)
+    } else if (j.obj.get("text").isDefined) {
+      val text = j("text").str
+      textReader.extractMatches(text)
+    } else {
+      throw new RuntimeException("You must pass either a `textfile` or a `text`")
+    }
+    val jsonMatches = JsonUtils.asJsonArray(matchesAsJsonStrings(matches))
+    Ok(jsonMatches)
   }
 
 }

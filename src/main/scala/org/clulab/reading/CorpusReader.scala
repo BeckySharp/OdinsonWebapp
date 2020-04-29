@@ -49,42 +49,9 @@ object CorpusReader {
     pw.flush()
     pw.close()
   }
-}
 
-class CorpusReader(
-  val extractorEngine: ExtractorEngine,
-  val numEvidenceDisplay: Int,
-  consolidateByLemma: Boolean,
-) {
-
-  lazy val proc = new FastNLPProcessor
-
-  // todo: remove the query box from the UI
-  /**
-   * Get extractions for each of the rules.  Since each rule can have different arguments, we keep the
-   * extractions separated by rule, and we'll display them separately.
-   * @param rules
-   * @return Map[ruleName, consolidated extractions for that rule]
-   */
-  def extractMatchesFromRules(rules: String): Seq[Match] = {
-    val extractors = extractorEngine.ruleReader.compileRuleFile(rules)
-    extractMatches(extractors)
-  }
-
-  def extractMatchesFromRules(rules: Seq[Rule]): Seq[Match] = {
-    val extractors = extractorEngine.ruleReader.mkExtractors(rules)
-    extractMatches(extractors)
-  }
-
-  /**
-   * Apply extractors to corpus to get the matches
-   * @param extractors
-   * @return sequence of Match
-   */
-  def extractMatches(extractors: Seq[Extractor]): Seq[Match] = {
-    val mentions = extractorEngine.extractMentions(extractors)
-    // Convert the mentions into our Match objects
-    getMatches(mentions)
+  def matchesAsJsonStrings(ms: Seq[Match]): Seq[String] = {
+    ms.map(m => write(m))
   }
 
   /**
@@ -122,6 +89,49 @@ class CorpusReader(
     rankMatches(consolidator.getMatches)
   }
 
+  private def rankMatches(matches: Seq[ConsolidatedMatch]): Seq[ConsolidatedMatch] = {
+    matches.sortBy(-_.count)
+  }
+
+}
+
+class CorpusReader(
+  val extractorEngine: ExtractorEngine,
+  val numEvidenceDisplay: Int,
+  consolidateByLemma: Boolean,
+) {
+
+  lazy val proc = new FastNLPProcessor
+
+// todo: remove the query box from the UI
+  /**
+   * Get extractions for each of the rules.  Since each rule can have different arguments, we keep the
+   * extractions separated by rule, and we'll display them separately.
+   * @param rules
+   * @return Map[ruleName, consolidated extractions for that rule]
+   */
+  def extractMatchesFromRules(rules: String): Seq[Match] = {
+    val extractors = extractorEngine.ruleReader.compileRuleFile(rules)
+    extractMatches(extractors)
+  }
+
+  def extractMatchesFromRules(rules: Seq[Rule]): Seq[Match] = {
+    val extractors = extractorEngine.ruleReader.mkExtractors(rules)
+    extractMatches(extractors)
+  }
+
+
+  /**
+   * Apply extractors to corpus to get the matches
+   * @param extractors
+   * @return sequence of Match
+   */
+  def extractMatches(extractors: Seq[Extractor]): Seq[Match] = {
+    val mentions = extractorEngine.extractMentions(extractors)
+    // Convert the mentions into our Match objects
+    getMatches(mentions)
+  }
+
   private def getMatches(mentions: Seq[Mention]): Seq[Match] = {
     for {
       mention <- mentions
@@ -147,10 +157,6 @@ class CorpusReader(
       case em: EventMatch => Some(NamedCapture("trigger", None, em.trigger))
       case _ => None
     }
-  }
-
-  private def rankMatches(matches: Seq[ConsolidatedMatch]): Seq[ConsolidatedMatch] = {
-    matches.sortBy(-_.count)
   }
 
 
