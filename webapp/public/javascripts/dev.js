@@ -1,4 +1,4 @@
-
+tableIndex = 0;
 $(document).ready(function () {
 
     var code = $(".codemirror-textarea")[0];

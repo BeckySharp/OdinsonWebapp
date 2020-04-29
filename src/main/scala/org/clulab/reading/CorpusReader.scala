@@ -5,6 +5,7 @@ import java.io.PrintWriter
 import ai.lum.common.ConfigUtils._
 import ai.lum.common.ConfigFactory
 import ai.lum.odinson._
+import org.clulab.processors.Processor
 import org.clulab.processors.fastnlp.FastNLPProcessor
 import ujson.Value
 import upickle.default._
@@ -52,45 +53,6 @@ object CorpusReader {
 
   def matchesAsJsonStrings(ms: Seq[Match]): Seq[String] = {
     ms.map(m => write(m))
-  }
-
-  /**
-   * Consolidate results by rule and return the consolidated Matches, persisting
-   * all evidence for downstream users.
-   * @param matches
-   * @return Map with consolidated matches (i.e., "deduplicated") for each rule (key)
-   */
-  def consolidateMatches(matches: Seq[Match]): Map[String, Seq[ConsolidatedMatch]] = {
-    // Each rule may have different args and different numbers of args, so we'll need to display
-    // them separately.
-    val groupByRule = matches.groupBy(_.foundBy).toSeq
-    val consolidated = for {
-      (foundBy, matchGroup) <- groupByRule
-      consolidatedRanked = consolidateAndRank(matchGroup)
-    } yield (foundBy, consolidatedRanked)
-    consolidated
-      .toMap
-  }
-
-  def consolidateAndRank(ms: Seq[Match]): Seq[ConsolidatedMatch] = {
-    // count matches so that we can add them to the consolidator efficiently
-    // Group by that unique identity mentioned above
-    val regroupedMatches = ms
-      .groupBy(_.pseudoIdentity)
-      // get the count of how many times this result appeared and all the sentences where it happened
-      // here the length of the values is the count, and we persist all of the evidence even while consolidating
-      .mapValues(vs => (vs.length, vs.map(v => v.evidence)))
-    // consolidate matches
-    val consolidator = new Consolidator(proc)
-    for ((pseudoIdentity, (count, sentences)) <- regroupedMatches.toSeq) {
-      consolidator.add(pseudoIdentity, count, sentences)
-    }
-    // Rank the consolidated matches
-    rankMatches(consolidator.getMatches)
-  }
-
-  private def rankMatches(matches: Seq[ConsolidatedMatch]): Seq[ConsolidatedMatch] = {
-    matches.sortBy(-_.count)
   }
 
 }

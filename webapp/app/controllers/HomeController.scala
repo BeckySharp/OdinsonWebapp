@@ -6,9 +6,9 @@ import java.util.Date
 
 import javax.inject._
 import org.clulab.reading.{CorpusReader, DependencySearcher, Match, RuleBuilder, TextReader}
+import org.clulab.reading.Consolidator._
 import org.clulab.reading.CorpusReader._
 import org.clulab.reading.utils.DisplayUtils
-import play.api.libs.json._
 import play.api.mvc._
 
 
@@ -50,7 +50,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     if (exportMatches) {
       exportResults(ruleNameHack(rules), matches)
     }
-    val resultsByRule = consolidateMatches(matches)
+    val resultsByRule = consolidateMatchesByRule(matches, proc)
     println(s"num results: ${resultsByRule.toSeq.flatMap(_._2).length}")
     val json = JsonUtils.mkJsonDict(resultsByRule)
 //    println(Json.prettyPrint(json))
@@ -72,7 +72,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val matches = reader.extractMatchesFromRules(rules)
     val reformatted = DisplayUtils.replaceTriggerName(j, matches)
     // TODO: export if desired
-    val results = consolidateAndRank(reformatted)
+    val results = consolidateAndRank(reformatted, proc)
     println(s"num results: ${results.length}")
     val out = JsonUtils.mkJsonDict(Map(ruleName -> results))
     Ok(out)

@@ -80,3 +80,45 @@ class Consolidator(
 
 
 }
+
+object Consolidator {
+  /**
+   * Consolidate results by rule and return the consolidated Matches, persisting
+   * all evidence for downstream users.
+   * @param matches
+   * @return Map with consolidated matches (i.e., "deduplicated") for each rule (key)
+   */
+  def consolidateMatchesByRule(matches: Seq[Match], proc: Processor): Map[String, Seq[ConsolidatedMatch]] = {
+    // Each rule may have different args and different numbers of args, so we'll need to display
+    // them separately.
+    val groupByRule = matches.groupBy(_.foundBy).toSeq
+    val consolidated = for {
+      (foundBy, matchGroup) <- groupByRule
+      consolidatedRanked = consolidateAndRank(matchGroup, proc: Processor)
+    } yield (foundBy, consolidatedRanked)
+    consolidated
+      .toMap
+  }
+
+  def consolidateAndRank(ms: Seq[Match], proc: Processor): Seq[ConsolidatedMatch] = {
+    // count matches so that we can add them to the consolidator efficiently
+    // Group by that unique identity mentioned above
+    val regroupedMatches = ms
+      .groupBy(_.pseudoIdentity)
+      // get the count of how many times this result appeared and all the sentences where it happened
+      // here the length of the values is the count, and we persist all of the evidence even while consolidating
+      .mapValues(vs => (vs.length, vs.map(v => v.evidence)))
+    // consolidate matches
+    val consolidator = new Consolidator(proc)
+    for ((pseudoIdentity, (count, sentences)) <- regroupedMatches.toSeq) {
+      consolidator.add(pseudoIdentity, count, sentences)
+    }
+    // Rank the consolidated matches
+    rankMatches(consolidator.getMatches)
+  }
+
+  private def rankMatches(matches: Seq[ConsolidatedMatch]): Seq[ConsolidatedMatch] = {
+    matches.sortBy(-_.count)
+  }
+
+}

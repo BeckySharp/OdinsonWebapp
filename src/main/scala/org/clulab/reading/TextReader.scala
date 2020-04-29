@@ -37,7 +37,7 @@ class TextReader(val proc: Processor, val rules: String) {
     val odinsonDocument = ProcessorsUtils.convertDocument(procDoc)
     val ee = mkExtractorEngine(odinsonDocument)
     val reader = new CorpusReader(ee, numEvidenceDisplay, consolidateByLemma)
-    reader.extractMatches(rules)
+    reader.extractMatchesFromRules(rules)
   }
 
   /**
