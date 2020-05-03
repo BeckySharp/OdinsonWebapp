@@ -51,15 +51,15 @@ docker build -t odinsonwebapp .
 This generates a container named `odinsonwebapp`, which can be run using:
 
 ```
-docker run -it --rm -v $PWD:/tmp -p 9000:9000 -m=4gb -d odinsonwebapp
+docker run -it --rm -v $PWD:/root/webapp -p 9000:9000 -m=4gb -d odinsonwebapp
 ```
 
 Note that the default index for the Docker container is located in `docker/index`. If you want to build the container with a different index, you should replace this. You also need to ensure that `src/main/resources/application.conf` has `odinson.indexDir = "/root/webapp/docker/index"` for its index.
 
-Additionally, you'll note that this directory is mounted at `/tmp` in the Docker run command. This is so that you can save a rule file in this directory and send that to the `/process_text` API endpoint. So, if your rule file is called `rules.yml`, you would send the request as:
+Additionally, you'll note that this directory is mounted at `/root/webapp` in the Docker run command. This is so that you can save a rule file in this directory and send that to the `/process_text` API endpoint. So, if your rule file is called `rules.yml`, you would send the request as:
 
 ```
-curl --header "Content-Type: application/json"  --request POST --data '{"rulefile":"/tmp/rules.yml","text":"Text string to process."}' http://localhost:9000/process_text
+curl --header "Content-Type: application/json"  --request POST --data '{"rulefile":"/root/webapp/rules.yml","text":"Text string to process."}' http://localhost:9000/process_text
 ```
 
 If you wish/require to locate your rule file elsewhere, make sure to mount that directory as a volume to `/tmp`.
