@@ -40,4 +40,18 @@ with the local datetime (e.g., `example-rule_2020-04-08_10:47:36.jsonl`).
 
 ![image](docs/images/export.png)
 
+## Docker
+
+You can build this into a container with:
+
+```
+docker build -t odinsonwebapp .
+```
+
+This generates a container named `odinsonwebapp`, which can be run using:
+
+```
+docker run -it --rm -p 9000:9000 -d odinsonwebapp
+```
+
 Any feedback is much appreciated!
