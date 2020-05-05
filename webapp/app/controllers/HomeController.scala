@@ -4,6 +4,7 @@ import java.io.PrintWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 
+import ai.lum.common.ConfigFactory
 import javax.inject._
 import org.clulab.processors.fastnlp.FastNLPProcessor
 import org.clulab.reading.{CorpusReader, DependencySearcher, Match, RuleBuilder, TextReader}
@@ -25,6 +26,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   lazy val proc = new FastNLPProcessor()
   lazy val ruleBuilder = new RuleBuilder()
   lazy val nmodSearcher = new DependencySearcher
+  println("OdinsonWebapp is ready to go ...")
   // -------------------------------------------------
   def initializeCorpusReader(): Unit = if (reader.proc.isEmpty) reader.proc = Some(proc)
 
@@ -124,5 +126,12 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val jsonMatches = JsonUtils.asJsonArray(matchesAsJsonStrings(matches))
     Ok(jsonMatches)
   }
+
+  def index(): Action[AnyContent] = Action { request =>
+    val data = request.body.asJson.get.toString()
+    val j = ujson.read(data)
+
+  }
+
 
 }
