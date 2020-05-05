@@ -126,12 +126,5 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val jsonMatches = JsonUtils.asJsonArray(matchesAsJsonStrings(matches))
     Ok(jsonMatches)
   }
-
-  def index(): Action[AnyContent] = Action { request =>
-    val data = request.body.asJson.get.toString()
-    val j = ujson.read(data)
-
-  }
-
-
+  
 }
