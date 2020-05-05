@@ -8,7 +8,7 @@ import ai.lum.common.TryWithResources._
 import ai.lum.common.ConfigFactory
 import ai.lum.odinson.extra.ProcessorsUtils
 import ai.lum.odinson.{ExtractorEngine, Document => OdinsonDocument}
-import org.clulab.processors.Processor
+import org.clulab.processors.{Document => ProcDocument, Processor}
 import TextReader.fileContents
 
 import scala.io.Source
@@ -33,11 +33,23 @@ class TextReader(val proc: Processor, val rules: String) {
   }
 
   def extractMatches(text: String): Seq[Match] = {
-    val procDoc = proc.annotate(text)
+    val procDoc = mkPartialAnnotation(text)
     val odinsonDocument = ProcessorsUtils.convertDocument(procDoc)
     val ee = mkExtractorEngine(odinsonDocument)
     val reader = new CorpusReader(ee, numEvidenceDisplay, consolidateByLemma)
-    reader.extractMatches(rules)
+    reader.extractMatchesFromRules(rules)
+  }
+
+  def mkPartialAnnotation(text: String): ProcDocument = {
+    val doc = proc.mkDocument(text)
+    proc.tagPartsOfSpeech(doc)
+    proc.lemmatize(doc)
+    proc.recognizeNamedEntities(doc)
+    proc.parse(doc)
+    proc.chunking(doc)
+    // todo: add semantic role info soon
+    doc.clear()
+    doc
   }
 
   /**

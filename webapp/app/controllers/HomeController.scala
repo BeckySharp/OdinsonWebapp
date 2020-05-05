@@ -5,12 +5,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 import javax.inject._
-import org.clulab.reading.{CorpusReader, Match, TextReader}
+import org.clulab.reading.{CorpusReader, DependencySearcher, Match, RuleBuilder, TextReader}
+import org.clulab.reading.Consolidator._
 import org.clulab.reading.CorpusReader._
+import org.clulab.reading.utils.DisplayUtils
 import play.api.mvc._
 
-import scala.util.matching.Regex
-import scala.collection.mutable
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -23,6 +23,8 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   println("CorpusReader is getting started ...")
   val reader = CorpusReader.fromConfig
   val proc = reader.proc
+  lazy val ruleBuilder = new RuleBuilder()
+  lazy val nmodSearcher = new DependencySearcher
   println("CorpusReader is ready to go ...")
   // -------------------------------------------------
 
@@ -33,24 +35,22 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
    * will be called when the application receives a `GET` request with
    * a path of `/`.
    */
-//  def index() = Action { implicit request: Request[AnyContent] =>
-//    Ok(views.html.index())
-//  }
 
   def dev() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.dev())
   }
 
+  def simple() = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.simple())
+  }
+
   def getCustomRuleResults(rules: String, exportMatches: Boolean) = Action {
     // println(s"[DEV] Query: <<$query>>\tRULE: <<$rule>>")
-    val matches = reader.extractMatches(rules)
+    val matches = reader.extractMatchesFromRules(rules)
     if (exportMatches) {
-      // fixme
-      val localDateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss")
-      val outfile = s"${ruleNameHack(rules)}_${localDateFormat.format(new Date)}.jsonl"
-      CorpusReader.writeMatchesTo(matches, outfile)
+      exportResults(ruleNameHack(rules), matches)
     }
-    val resultsByRule = consolidateMatches(matches, reader.proc)
+    val resultsByRule = consolidateMatchesByRule(matches, proc)
     println(s"num results: ${resultsByRule.toSeq.flatMap(_._2).length}")
     val json = JsonUtils.mkJsonDict(resultsByRule)
 //    println(Json.prettyPrint(json))
@@ -61,6 +61,35 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val namePattern = """name:\s*([^\s\\]+)""".r
     val m = namePattern.findFirstMatchIn(rules)
     m.get.group(1)
+  }
+
+  def buildRules(data:String) = Action {
+    println(data)
+    // todo: making an Obj in two places now... refactor?
+    val j = ujson.read(data)
+    val ruleName = j.obj.get("ruleName").map(_.str).getOrElse("NO_NAME")
+    val rules = ruleBuilder.buildRules(j)
+    val matches = reader.extractMatchesFromRules(rules)
+    val reformatted = DisplayUtils.replaceTriggerName(j, matches)
+    // TODO: export if desired
+    val results = consolidateAndRank(reformatted, proc)
+    println(s"num results: ${results.length}")
+    val out = JsonUtils.mkJsonDict(Map(ruleName -> results))
+    Ok(out)
+  }
+
+  def exportResults(filePrefix: String, matches: Seq[Match]): Unit = {
+    // fixme
+    val localDateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss")
+    val outfile = s"${filePrefix}_${localDateFormat.format(new Date)}.jsonl"
+    CorpusReader.writeMatchesTo(matches, outfile)
+  }
+
+  // Used to get other nmod suggestions for the modifier panel, given an nmod query
+  def getSimilarMods(query: String) = Action {
+    val similarNmods = nmodSearcher.mostSimilar(query)
+    val json = JsonUtils.mkJsonSimilarities(similarNmods)
+    Ok(json)
   }
 
   def saveRules(rules: String, filename: String) = Action {
