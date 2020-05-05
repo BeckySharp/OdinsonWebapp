@@ -63,7 +63,7 @@ class CorpusReader(
   consolidateByLemma: Boolean,
 ) {
 
-  lazy val proc = new FastNLPProcessor
+  var proc: Option[Processor] = None
 
 // todo: remove the query box from the UI
   /**
@@ -141,9 +141,11 @@ class CorpusReader(
 
   private def convertToLemmas(words: Seq[String]): Seq[String] = {
     val s = words.mkString(" ")
-    val doc = proc.mkDocument(s)
-    proc.tagPartsOfSpeech(doc)
-    proc.lemmatize(doc)
+    assert(proc.isDefined, "The CorpusReader processor wasn't initialized")
+    val processor = proc.get
+    val doc = processor.mkDocument(s)
+    processor.tagPartsOfSpeech(doc)
+    processor.lemmatize(doc)
     doc.clear()
     val sentence = doc.sentences.head
     // return the lemmas

@@ -4,7 +4,9 @@ import java.io.PrintWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 
+import ai.lum.common.ConfigFactory
 import javax.inject._
+import org.clulab.processors.fastnlp.FastNLPProcessor
 import org.clulab.reading.{CorpusReader, DependencySearcher, Match, RuleBuilder, TextReader}
 import org.clulab.reading.Consolidator._
 import org.clulab.reading.CorpusReader._
@@ -20,13 +22,13 @@ import play.api.mvc._
 class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
 
   // -------------------------------------------------
-  println("CorpusReader is getting started ...")
-  val reader = CorpusReader.fromConfig
-  val proc = reader.proc
+  lazy val reader = CorpusReader.fromConfig
+  lazy val proc = new FastNLPProcessor()
   lazy val ruleBuilder = new RuleBuilder()
   lazy val nmodSearcher = new DependencySearcher
-  println("CorpusReader is ready to go ...")
+  println("OdinsonWebapp is ready to go ...")
   // -------------------------------------------------
+  def initializeCorpusReader(): Unit = if (reader.proc.isEmpty) reader.proc = Some(proc)
 
   /**
    * Create an Action to render an HTML page.
@@ -37,10 +39,12 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
    */
 
   def dev() = Action { implicit request: Request[AnyContent] =>
+    initializeCorpusReader()
     Ok(views.html.dev())
   }
 
   def simple() = Action { implicit request: Request[AnyContent] =>
+    initializeCorpusReader()
     Ok(views.html.simple())
   }
 
@@ -64,7 +68,6 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   }
 
   def buildRules(data:String) = Action {
-    println(data)
     // todo: making an Obj in two places now... refactor?
     val j = ujson.read(data)
     val ruleName = j.obj.get("ruleName").map(_.str).getOrElse("NO_NAME")
@@ -123,5 +126,5 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val jsonMatches = JsonUtils.asJsonArray(matchesAsJsonStrings(matches))
     Ok(jsonMatches)
   }
-
+  
 }
