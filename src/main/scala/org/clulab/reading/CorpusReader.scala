@@ -55,41 +55,6 @@ object CorpusReader {
     ms.map(m => write(m))
   }
 
-  /**
-   * Consolidate results by rule and return the consolidated Matches, persisting
-   * all evidence for downstream users.
-   * @param matches
-   * @return Map with consolidated matches (i.e., "deduplicated") for each rule (key)
-   */
-  def consolidateMatches(matches: Seq[Match], proc: Processor): Map[String, Seq[ConsolidatedMatch]] = {
-    // Each rule may have different args and different numbers of args, so we'll need to display
-    // them separately.
-    val groupByRule = matches.groupBy(_.foundBy).toSeq
-    val consolidated = for {
-      (foundBy, matchGroup) <- groupByRule
-      // count matches so that we can add them to the consolidator efficiently
-      // Group by that unique identity mentioned above
-      regroupedMatches = matchGroup
-        .groupBy(_.pseudoIdentity)
-        // get the count of how many times this result appeared and all the sentences where it happened
-        // here the length of the values is the count, and we persist all of the evidence even while consolidating
-        .mapValues(vs => (vs.length, vs.map(v => v.evidence)))
-      // consolidate matches
-      consolidator = new Consolidator(proc)
-      (pseudoIdentity, (count, sentences)) <- regroupedMatches.toSeq
-      _ = consolidator.add(pseudoIdentity, count, sentences)
-      // return results
-    } yield (foundBy, consolidator.getMatches)
-    // Rank the consolidated matches
-    consolidated
-      .toMap
-      .mapValues(rankMatches)
-  }
-
-  private def rankMatches(matches: Seq[ConsolidatedMatch]): Seq[ConsolidatedMatch] = {
-    matches.sortBy(-_.count)
-  }
-
 }
 
 class CorpusReader(
@@ -98,19 +63,25 @@ class CorpusReader(
   consolidateByLemma: Boolean,
 ) {
 
-  lazy val proc = new FastNLPProcessor
+  var proc: Option[Processor] = None
 
-  // todo: remove the query box from the UI
+// todo: remove the query box from the UI
   /**
    * Get extractions for each of the rules.  Since each rule can have different arguments, we keep the
    * extractions separated by rule, and we'll display them separately.
    * @param rules
    * @return Map[ruleName, consolidated extractions for that rule]
    */
-  def extractMatches(rules: String): Seq[Match] = {
-    val extractors = mkExtractorsFromRules(rules)
+  def extractMatchesFromRules(rules: String): Seq[Match] = {
+    val extractors = extractorEngine.ruleReader.compileRuleFile(rules)
     extractMatches(extractors)
   }
+
+  def extractMatchesFromRules(rules: Seq[Rule]): Seq[Match] = {
+    val extractors = extractorEngine.ruleReader.mkExtractors(rules)
+    extractMatches(extractors)
+  }
+
 
   /**
    * Apply extractors to corpus to get the matches
@@ -150,9 +121,6 @@ class CorpusReader(
     }
   }
 
-  private def mkExtractorsFromRules(rules: String): Seq[Extractor] = {
-    extractorEngine.ruleReader.compileRuleFile(rules.mkString)
-  }
 
   /**
    * Create a representation of each the named captures that has: (a) the label of the named capture,
@@ -173,9 +141,11 @@ class CorpusReader(
 
   private def convertToLemmas(words: Seq[String]): Seq[String] = {
     val s = words.mkString(" ")
-    val doc = proc.mkDocument(s)
-    proc.tagPartsOfSpeech(doc)
-    proc.lemmatize(doc)
+    assert(proc.isDefined, "The CorpusReader processor wasn't initialized")
+    val processor = proc.get
+    val doc = processor.mkDocument(s)
+    processor.tagPartsOfSpeech(doc)
+    processor.lemmatize(doc)
     doc.clear()
     val sentence = doc.sentences.head
     // return the lemmas

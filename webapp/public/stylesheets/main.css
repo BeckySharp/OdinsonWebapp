@@ -172,9 +172,10 @@ tr.shown td.details-control {
     background: url('/assets/images/minus.svg') no-repeat center center;
 }
 .dev caption {
-  text-align: center;
+  text-align: left;
   color: var(--odinson-dk-blue);
-  background: #C9D6EB ;
+  /*background: #C9D6EB ;*/
+  background: #FFFFFF ;
   font-size: 1.3em;
   margin-left: -1px; /* Fix FF 1px issue */
   padding: 5px;

@@ -1,19 +1,31 @@
 <html>
 <head>
-    <title>Odinson Rule Development UI</title>
-    <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
-    <link rel="stylesheet" type="text/css" href="assets/stylesheets/jquery.dataTables.min.css"/>
-    <link rel="stylesheet" href="assets/plugins/DataTables/colReorder.css">
-    <script type="text/javascript" src="assets/javascripts/jquery-3.2.1.min.js"></script>
-    <script type="text/javascript" src="assets/javascripts/jquery.dataTables.min.js"></script>
-    <script src="assets/plugins/DataTables/colReorder.js"></script>
-    <script type="text/javascript" src="assets/javascripts/dev.js"></script>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <title>Odinson Rule Development UI</title>
+    <link rel="stylesheet" type="text/css" href="assets/plugins/bootstrap-4.4.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/containers.css"/>
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" href="assets/plugins/DataTables/colReorder.css" />
+    <link rel="stylesheet" href="assets/plugins/jquery-datatables-checkboxes-1.2.11/css/dataTables.checkboxes.css" />
+    <script type="text/javascript" src="assets/javascripts/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="assets/javascripts/popper.js"></script>
+    <script type="text/javascript" src="assets/plugins/bootstrap-4.4.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="assets/javascripts/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="assets/plugins/jquery-datatables-checkboxes-1.2.11/js/dataTables.checkboxes.min.js"></script>
+    <script src="assets/plugins/DataTables/colReorder.js"></script>
+    <script type="text/javascript" src="assets/javascripts/sweetalert.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
+    <script type="text/javascript" src="assets/javascripts/simple.js"></script>
 
 </head>
 
 <body>
+<div class="container-fluid flex-fill p-4">
 <h1>Odinson Rule Development Simple UI</h1>
+</div>
 <!--new rule-->
 
 <!--3 panes-->
@@ -24,21 +36,113 @@
     </div>
 </div>
 
-<form>
+<div class="container-fluid flex-fill d-flex flex-column padded align-top" >
+    <div class="row flex-fill">
+        <!-- SVO Rule builder panel-->
+        <div class="col-6 padded d-flex flex-column resizable outlined">
+            <form id="svoForm">
+                <h1>Rule Workspace</h1>
+                <br>
+                <p> rule name: <input type="text" id="rulename" value="example-rule"> </p>
+                <table id="svoTable" class="svo">
+                    <tr class="pad-top">
+                        <th> </th>
+                        <th> Label </th>
+                        <th> Word(s)  </th>
+                        <th>  req  </th>
+                        <th>  opt  </th>
+                    </tr>
+                    <tr class="pad">
+                        <td> subject </td>
+                        <td> <input type="text" id="sLabel" placeholder="subject"> </td>
+                        <td> <input type="text" value="" id="sWords"> </td>
+                        <td>
+                            <input type="radio" value="required" name="subj_radio" checked>
+                        </td>
+                        <td>
+                            <input type="radio" value="optional" name="subj_radio">
+                        </td>
+                        <td class="tight-left">
+                            <button type="button" class="delete"></button>
+                        </td>
+                    </tr>
+                    <tr class="pad">
+                        <td> verb </td>
+                        <td> <input type="text" placeholder="verb" id="vLabel"> </td>
+                        <td> <input type="text" value="" id="vWords">  </td>
+                        <td>
+                            <input type="radio" value="required" name="verb_radio" checked>
+                        </td>
+                        <td>
+                            <input type="radio" value="optional" name="verb_radio">
 
-    <label for="rules">Rules:</label>
-    <textarea id="rules" class="codemirror-textarea" rows="10" cols="100">
-        ... change to something else ...
-        .. add panes
-    </textarea>
-    <br>
-    <input type="submit">
-</form>
+                        </td>
+                        <td class="tight-left">
+                            <button type="button" class="delete"></button>
+                        </td>
+                    </tr>
+                    <tr class="pad">
+                        <td> object </td>
+                        <td> <input type="text" placeholder="object" id="oLabel">  </td>
+                        <td> <input type="text" value="" id="oWords"> </td>
+                        <td>
+                            <input type="radio" value="required" name="obj_radio" checked>
+                        </td>
+                        <td>
+                            <input type="radio" value="optional" name="obj_radio">
+<!--                            <button type="button" class="delete"> </button>-->
+                        </td>
+                        <td class="tight-left">
+                            <button type="button" class="delete"></button>
+                        </td>
 
-<!--extractions table at the bottom-->
-<table id="results" class="display" width="100%">
-    <caption id="tablecaption"></caption>
-</table>
+                    </tr>
+                </table>
+                <br>
+                <input class="submitbutton main" type="submit" value="TEST RULE">
+            </form>
+        </div>
+        <!-- RHS panel-->
+        <div class="col d-flex flex-column">
+            <!-- Rule modifications panel-->
+            <div class="col align-top">
+                <div class="col padded outlined resizable">
+                    <h1>Extra information</h1>
+                    <br>
+                    <form id="modifierForm">
+                        <h2>
+                            <p> Add argument based on: <input type="text" id="searchTerm">
+                                <input class="submitbutton sm" id="searchBtn" type="submit" value="SEARCH"> </p>
+                        </h2>
+                        <h2> Similar options: </h2>
+                        <table id="modTable" class="mod svo" width="100%">
+                            <caption id="modtablecaption"></caption>
+                        </table>
+                        <input class="submitbutton sm" id="addModBtn" type="button" value="ADD TO RULE" disabled="true">
+
+                    </form>
+
+                </div>
+            </div>
+            <!-- grammar builder panel-->
+            <div class="col vert-padded">
+                <div class="col padded outlined resizable">
+                    <h1>Saved rules</h1>
+                    <br>
+                    This is the saved grammar panel
+                    <br><br><br>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluids p-3 flex-fill">
+    <!--extractions table at the bottom-->
+    <table id="results" class="display svo" width="100%">
+        <caption id="tablecaption"></caption>
+    </table>
+</div>
 
 </body>
 </html>
