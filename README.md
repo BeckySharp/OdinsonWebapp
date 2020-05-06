@@ -64,4 +64,6 @@ curl --header "Content-Type: application/json"  --request POST --data '{"rulefil
 
 If you wish/require to locate your rule file elsewhere, make sure to mount that directory as a volume and then specify the appropriate container path in your `POST` request.
 
+> Note: if you only with to use the `/process_text` API and not the web app, you do not need to specify an index.
+
 Any feedback is much appreciated!
