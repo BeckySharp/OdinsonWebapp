@@ -73,7 +73,7 @@ class CorpusReader(
    * @return Map[ruleName, consolidated extractions for that rule]
    */
   def extractMatchesFromRules(rules: String): Seq[Match] = {
-    val extractors = extractorEngine.ruleReader.compileRuleFile(rules)
+    val extractors = extractorEngine.compileRuleString(rules)
     extractMatches(extractors)
   }
 
