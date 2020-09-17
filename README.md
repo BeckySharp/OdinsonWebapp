@@ -6,6 +6,15 @@ Odinson is a highly optimized information extraction framework that
 supports *real-time* queries against an indexed corpus.
 For more information, please see [Odinson's documentaion](https://github.com/lum-ai/odinson).
 
+**Please note:** I am trying to stay in sync with Odinson (as many improvements are being made), but it's still under development.
+Currently this webapp is using a **snapshot** of Odinson.  To use, you should clone Odinson:
+
+    git clone git@github.com:lum-ai/odinson.git
+    cd odinson
+    sbt publishLocal
+
+This jar assembly be relatively fast, and as soon as Odinson version 0.3.0 is released, this will no longer be necessary.  Apologies!!
+If you have trouble with this, please let me know and I can try to help!
 
 To use this webapp, I assume you already have an [Odinson index made](https://github.com/lum-ai/odinson/tree/master/extra).
 

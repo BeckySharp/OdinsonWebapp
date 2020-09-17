@@ -28,7 +28,12 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   lazy val nmodSearcher = new DependencySearcher
   println("OdinsonWebapp is ready to go ...")
   // -------------------------------------------------
-  def initializeCorpusReader(): Unit = if (reader.proc.isEmpty) reader.proc = Some(proc)
+  def initializeCorpusReader(): Unit = {
+    if (reader.proc.isEmpty) {
+      println("Initializing CorpusReader")
+      reader.proc = Some(proc)
+    }
+  }
 
   /**
    * Create an Action to render an HTML page.
@@ -49,7 +54,9 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   }
 
   def getCustomRuleResults(rules: String, exportMatches: Boolean) = Action {
-    // println(s"[DEV] Query: <<$query>>\tRULE: <<$rule>>")
+    // Make sure the reader is initialized
+    initializeCorpusReader()
+
     val matches = reader.extractMatchesFromRules(rules)
     if (exportMatches) {
       exportResults(ruleNameHack(rules), matches)
@@ -57,7 +64,6 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val resultsByRule = consolidateMatchesByRule(matches, proc)
     println(s"num results: ${resultsByRule.toSeq.flatMap(_._2).length}")
     val json = JsonUtils.mkJsonDict(resultsByRule)
-//    println(Json.prettyPrint(json))
     Ok(json)
   }
 

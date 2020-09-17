@@ -139,12 +139,12 @@ class RuleBuilder {
     mods: Seq[ArgInfo]
   ): Seq[Rule] = {
     // todo: use mods
-    val declarativeRule = Rule(s"$ruleName-decl", None, "event", declarative(subj, verb, obj, mods))
-    val passiveRule = Rule(s"$ruleName-passive", None, "event", passive(subj, verb, obj, mods))
-    val prepNominalizationRule = Rule(s"$ruleName-prepNominalization", None, "event", prepositionalNominalization(subj, verb, obj, mods))
+    // todo: expansion
+    val declarativeRule = Rule(s"$ruleName-decl", None, "event", "1", declarative(subj, verb, obj, mods))
+    val passiveRule = Rule(s"$ruleName-passive", None, "event", "1", passive(subj, verb, obj, mods))
+    val prepNominalizationRule = Rule(s"$ruleName-prepNominalization", None, "event", "1", prepositionalNominalization(subj, verb, obj, mods))
 
     Seq(declarativeRule, passiveRule, prepNominalizationRule)
-//    Seq(prepNominalizationRule)
   }
 
 
