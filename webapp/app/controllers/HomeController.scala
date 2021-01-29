@@ -25,7 +25,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   lazy val reader = CorpusReader.fromConfig
   lazy val proc = new FastNLPProcessor()
   lazy val ruleBuilder = new RuleBuilder()
-  lazy val nmodSearcher = new DependencySearcher
+  var nmodSearcher: Option[DependencySearcher] = None
   println("OdinsonWebapp is ready to go ...")
   // -------------------------------------------------
   def initializeCorpusReader(): Unit = {
@@ -96,7 +96,10 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   // Used to get other nmod suggestions for the modifier panel, given an nmod query
   def getSimilarMods(query: String) = Action {
-    val similarNmods = nmodSearcher.mostSimilar(query)
+    if (nmodSearcher.isEmpty) {
+      nmodSearcher = Some(new DependencySearcher)
+    }
+    val similarNmods = nmodSearcher.get.mostSimilar(query)
     val json = JsonUtils.mkJsonSimilarities(similarNmods)
     Ok(json)
   }

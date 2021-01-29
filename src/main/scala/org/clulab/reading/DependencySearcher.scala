@@ -2,14 +2,14 @@ package org.clulab.reading
 
 import ai.lum.common.ConfigUtils._
 import ai.lum.common.ConfigFactory
-import org.clulab.embeddings.word2vec.Word2Vec
 import DependencySearcher._
+import org.clulab.embeddings.WordEmbeddingMap
 
 
 case class DependencySimilarity(dep: String, display: String, score: Double)
 class DependencySearcher {
   val config = ConfigFactory.load()
-  val nmodW2V = new Word2Vec(config[String]("nmodVectors"))
+  val nmodW2V = new WordEmbeddingMap(config[String]("nmodVectors"))
 
   def mostSimilar(s: String, n: Int = 25): Seq[DependencySimilarity] = {
     // TODO: Sieve -- check nmod first?

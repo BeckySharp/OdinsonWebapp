@@ -5,7 +5,7 @@ import java.io.{File, PrintWriter}
 import ai.lum.common.ConfigUtils._
 import ai.lum.common.TryWithResources.using
 import ai.lum.common.ConfigFactory
-import org.clulab.embeddings.word2vec.Word2Vec
+import org.clulab.embeddings.WordEmbeddingMap
 import org.clulab.reading.DependencySearcher.asTokens
 
 import scala.io.Source
@@ -46,17 +46,17 @@ object MakeNmodEmbeddings extends App {
 
   // Load the deps vocab for the index
   val config = ConfigFactory.load()
-  val indexDir = config[String]("odinson.indexDir")
+  val indexDir: String = config[String]("odinson.indexDir")
   val nmodDeps = loadDependencies(s"$indexDir/dependencies.txt")
 
   // Load w2v Embeddings
-  val vectors = config[String]("wordVectors")
-  val w2v = new Word2Vec(vectors)
+  val vectors: String = config[String]("wordVectors")
+  val w2v = new WordEmbeddingMap(vectors)
 
   // for each nmod, split on _ and remove nmod
   val nmodEmbeds = mapNmodEmbeddings(nmodDeps)
 
   // store embeddings for each nmod, make sure to update header of the file
-  val nmodVectorsOut = config[String]("nmodVectors")
+  val nmodVectorsOut: String = config[String]("nmodVectors")
   saveMatrix(nmodVectorsOut, nmodEmbeds.toMap)
 }
