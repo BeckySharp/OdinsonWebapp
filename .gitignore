@@ -4,7 +4,7 @@
 *.json
 
 .idea/
-target/*
+target
 project/project
 project/target
 
