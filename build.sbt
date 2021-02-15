@@ -11,6 +11,8 @@ resolvers ++=  Seq(
 val procVer = "8.2.3"
 val odinsonVer = "0.3.0-SNAPSHOT"
 
+disablePlugins(sbtassembly.AssemblyPlugin)
+
 libraryDependencies ++= Seq(
   "org.clulab"    %% "processors-main"          % procVer,
   "org.clulab"    %% "processors-corenlp"       % procVer,
