@@ -54,6 +54,7 @@ with the local datetime (e.g., `example-rule_2020-04-08_10:47:36.jsonl`).
 You can build this into a container with:
 
 ```
+sbt "project webapp" "dist"
 docker build -t odinsonwebapp .
 ```
 
