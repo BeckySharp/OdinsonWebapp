@@ -1,23 +1,16 @@
-FROM ysihaoy/scala-play:2.12.2-2.6.0-sbt-0.13.15
+FROM openjdk:8
 
-# Install Odinson
-RUN apk --no-cache add git
-RUN git clone https://github.com/lum-ai/odinson /tmp/odinson
-RUN cd /tmp/odinson && \
-  sbt publishLocal
+ENV APP_DIR /opt/app
 
+RUN apt-get --assume-yes update && \
+    mkdir /opt/app
 
-# caching dependencies
-COPY ["build.sbt", "/tmp/build/"]
-COPY ["project/plugins.sbt", "project/build.properties", "/tmp/build/project/"]
-RUN cd /tmp/build && \
-  sbt compile && \
-  sbt test:compile && \
- rm -rf /tmp/build
+WORKDIR $APP_DIR
 
-# copy code
-COPY . /root/webapp
-WORKDIR /root/webapp
+COPY ./webapp/target/universal/webapp*.zip $APP_DIR/app.zip
 
-EXPOSE 9000
-CMD sbt webapp/run
+RUN unzip -q $APP_DIR/app.zip && \
+    export APP=$(ls -d */ | grep webapp) && \
+    mv $APP app
+
+ENTRYPOINT $APP_DIR/app/bin/webapp
