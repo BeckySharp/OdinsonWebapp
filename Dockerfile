@@ -3,7 +3,9 @@ FROM openjdk:8
 
 ENV APP_DIR /opt/app
 
-RUN mkdir /opt/app
+RUN mkdir /opt/app && \
+    apt-get update && \
+    apt-get --assume-yes install vim unzip
 
 WORKDIR $APP_DIR
 
