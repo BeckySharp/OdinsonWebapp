@@ -1,16 +1,16 @@
-
 FROM openjdk:8
 
 ENV APP_DIR /opt/app
 
-RUN mkdir /opt/app && \
-    apt-get update && \
-    apt-get --assume-yes install vim
+RUN apt-get --assume-yes update && \
+    mkdir /opt/app
 
 WORKDIR $APP_DIR
 
-COPY ./webapp/target/scala-*/webapp*assembly*.jar $APP_DIR/app.jar
+ADD ./webapp/target/universal/webapp*.zip $APP_DIR/app.zip
 
-RUN chmod -R 755 /opt/app
+RUN unzip -q $APP_DIR/app.zip && \
+    export APP=$(ls -d */ | grep webapp) && \
+    mv $APP app
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT $APP_DIR/app/bin/webapp

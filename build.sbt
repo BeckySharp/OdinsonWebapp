@@ -21,17 +21,17 @@ libraryDependencies ++= Seq(
     "ai.lum" %% "common" % "0.0.10",
     "com.lihaoyi" %% "ujson" % "0.7.1",
     "com.lihaoyi" %% "upickle" % "0.7.1",
-    guice,
+    guice
     )
 
 lazy val core = ( project in file( "." ) )
   .disablePlugins( sbtassembly.AssemblyPlugin )
   .settings(
       test in assembly := {}
-  )
+      )
 
 lazy val webapp = project
-  .enablePlugins( PlayScala, JavaAppPackaging )
+  .enablePlugins( PlayScala, JavaAppPackaging, SbtNativePackager )
   .aggregate( core )
   .dependsOn( core )
   .settings(
@@ -55,6 +55,6 @@ lazy val webapp = project
       },
       test in assembly := {},
       Compile / unmanagedResourceDirectories += baseDirectory.value / "webapp" / "conf", // For fatjar to work
-      fullClasspath in assembly += Attributed.blank(PlayKeys.playPackageAssets.value),
-      mainClass in assembly := Some( "play.core.server.ProdServerStart" ), // For fatjar to work,
+//      fullClasspath in assembly += Attributed.blank( PlayKeys.playPackageAssets.value ),
+//      mainClass in assembly := Some( "play.core.server.ProdServerStart" ) // For fatjar to work,
     )
