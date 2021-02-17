@@ -5,7 +5,7 @@ ENV APP_DIR /opt/app
 
 RUN mkdir /opt/app && \
     apt-get update && \
-    apt-get --assume-yes install vim unzip
+    apt-get --assume-yes install vim
 
 WORKDIR $APP_DIR
 

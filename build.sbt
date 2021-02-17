@@ -55,6 +55,6 @@ lazy val webapp = project
       },
       test in assembly := {},
       Compile / unmanagedResourceDirectories += baseDirectory.value / "webapp" / "conf", // For fatjar to work
-      Compile / unmanagedResourceDirectories += baseDirectory.value / "webapp" / "public", // so javascript assets can be resolved relative to fatjar
+      fullClasspath in assembly += Attributed.blank(PlayKeys.playPackageAssets.value),
       mainClass in assembly := Some( "play.core.server.ProdServerStart" ), // For fatjar to work,
     )
