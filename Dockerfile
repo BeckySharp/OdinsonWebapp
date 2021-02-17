@@ -7,7 +7,7 @@ RUN apt-get --assume-yes update && \
 
 WORKDIR $APP_DIR
 
-ADD ./webapp/target/universal/webapp*.zip $APP_DIR/app.zip
+COPY ./webapp/target/universal/webapp*.zip $APP_DIR/app.zip
 
 RUN unzip -q $APP_DIR/app.zip && \
     export APP=$(ls -d */ | grep webapp) && \
