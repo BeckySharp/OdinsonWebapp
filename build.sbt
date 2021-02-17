@@ -27,8 +27,7 @@ libraryDependencies ++= Seq(
 lazy val core = ( project in file( "." ) )
   .disablePlugins( sbtassembly.AssemblyPlugin )
   .settings(
-      test in assembly := {},
-      Compile / unmanagedResourceDirectories += baseDirectory.value / "src/main/webapp"
+      test in assembly := {}
   )
 
 lazy val webapp = project
@@ -56,5 +55,6 @@ lazy val webapp = project
       },
       test in assembly := {},
       Compile / unmanagedResourceDirectories += baseDirectory.value / "webapp" / "conf", // For fatjar to work
-      mainClass in assembly := Some( "play.core.server.ProdServerStart" ), // For fatjar to work
-      )
+      Compile / unmanagedResourceDirectories += baseDirectory.value / "webapp" / "public", // so javascript assets can be resolved relative to fatjar
+      mainClass in assembly := Some( "play.core.server.ProdServerStart" ), // For fatjar to work,
+    )
