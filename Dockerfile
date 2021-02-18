@@ -1,6 +1,6 @@
 FROM openjdk:8
 
-ENV APP_DIR /opt/app
+ENV APP_DIR /opt/odinson
 
 RUN apt-get --assume-yes update && \
     mkdir /opt/app
