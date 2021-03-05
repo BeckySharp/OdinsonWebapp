@@ -4,7 +4,7 @@ organization := "org.clulab"
 resolvers +=  "Artifactory" at "http://artifactory.cs.arizona.edu:8081/artifactory/sbt-release" // processors-models
 
 val procVer = "8.2.3"
-val odinsonVer = "0.3.0-SNAPSHOT"
+val odinsonVer = "0.3.1"
 
 libraryDependencies ++= Seq(
   "org.clulab"    %% "processors-main"          % procVer,
