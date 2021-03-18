@@ -90,6 +90,7 @@ class CorpusReader(
    */
   def extractMatches(extractors: Seq[Extractor]): Seq[Match] = {
     val mentions = extractorEngine.extractMentions(extractors).toArray
+    extractorEngine.clearState()
     // Convert the mentions into our Match objects
     getMatches(mentions)
   }
