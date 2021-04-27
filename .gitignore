@@ -4,6 +4,8 @@
 *.json
 
 .idea/
-target/*
+target
 project/project
 project/target
+
+.DS_Store
