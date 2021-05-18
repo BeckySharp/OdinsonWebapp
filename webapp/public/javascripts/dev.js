@@ -162,6 +162,7 @@ $(document).ready(function () {
 
     });
 
+
     // Add event listener for opening and closing (evidence) details
     $(document).on('click', 'td.details-control', function () {
         var tr = $(this).closest('tr');
@@ -181,8 +182,17 @@ $(document).ready(function () {
     } );
 
 
+    $('form').bind('keydown', function(e) {
+        // enter + either command | ctrl?
+        if((e.keyCode == 13 && (e.metaKey || e.ctrlKey))) {
+            document.getElementById("rulesSubmitBtn").click();
+            e.preventDefault();
+        }
+    });
 
 });
+
+
 
 // --------------------------------------------------------------------------------------------------------
 //                                      TABLE FORMATTING METHODS
