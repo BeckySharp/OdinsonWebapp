@@ -2,6 +2,7 @@
 *.log
 
 *.json
+*.jsonl
 
 .idea/
 target
