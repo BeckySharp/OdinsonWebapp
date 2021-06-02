@@ -14,9 +14,7 @@ val odinsonVer = "0.3.1"
 
 libraryDependencies ++= Seq(
   "org.clulab" %% "processors-main" % procVer,
-  "org.clulab" %% "processors-corenlp" % procVer,
   "ai.lum" %% "odinson-core" % odinsonVer,
-  "ai.lum" %% "odinson-extra" % odinsonVer,
   "ai.lum" %% "common" % "0.0.10",
   "com.lihaoyi" %% "ujson" % "0.7.1",
   "com.lihaoyi" %% "upickle" % "0.7.1",

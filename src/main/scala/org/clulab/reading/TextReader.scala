@@ -1,15 +1,12 @@
 package org.clulab.reading
 
-import java.io.File
-
 import ai.lum.common.ConfigUtils._
-import ai.lum.common.FileUtils._
 import ai.lum.common.TryWithResources._
 import ai.lum.common.ConfigFactory
-import ai.lum.odinson.extra.ProcessorsUtils
 import ai.lum.odinson.{ExtractorEngine, Document => OdinsonDocument}
 import org.clulab.processors.{Document => ProcDocument, Processor}
 import TextReader.fileContents
+import utils.OdinsonUtils.convertDocument
 
 import scala.io.Source
 
@@ -34,7 +31,7 @@ class TextReader(val proc: Processor, val rules: String) {
 
   def extractMatches(text: String): Seq[Match] = {
     val procDoc = mkPartialAnnotation(text)
-    val odinsonDocument = ProcessorsUtils.convertDocument(procDoc)
+    val odinsonDocument = convertDocument(procDoc)
     val ee = mkExtractorEngine(odinsonDocument)
     val reader = new CorpusReader(ee, numEvidenceDisplay, consolidateByLemma)
     reader.proc = Some(proc)
