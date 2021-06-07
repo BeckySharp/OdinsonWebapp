@@ -6,15 +6,12 @@ import ai.lum.common.ConfigUtils._
 import ai.lum.common.ConfigFactory
 import ai.lum.odinson._
 import org.clulab.processors.Processor
-import org.clulab.processors.fastnlp.FastNLPProcessor
-import ujson.Value
 import upickle.default._
 import upickle.default.{macroRW, ReadWriter => RW}
 
 case class Match(
   docId: String,
   foundBy: String,
-//  namedCaptures: Array[NamedCapture],
   pseudoIdentity: Seq[NormalizedArg],
   evidence: Evidence,
 )

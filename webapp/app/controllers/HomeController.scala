@@ -6,7 +6,8 @@ import java.util.Date
 
 import ai.lum.common.ConfigFactory
 import javax.inject._
-import org.clulab.processors.fastnlp.FastNLPProcessor
+import org.clulab.dynet.Utils.initializeDyNet
+import org.clulab.processors.clu.CluProcessor
 import org.clulab.reading.{CorpusReader, DependencySearcher, Match, RuleBuilder, TextReader}
 import org.clulab.reading.Consolidator._
 import org.clulab.reading.CorpusReader._
@@ -23,7 +24,10 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   // -------------------------------------------------
   lazy val reader = CorpusReader.fromConfig
-  lazy val proc = new FastNLPProcessor()
+  lazy val proc = {
+    initializeDyNet()
+    new CluProcessor()
+  }
   lazy val ruleBuilder = new RuleBuilder()
   var nmodSearcher: Option[DependencySearcher] = None
   println("OdinsonWebapp is ready to go ...")

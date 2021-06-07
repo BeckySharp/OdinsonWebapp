@@ -1,8 +1,9 @@
 package org.clulab.reading
 
 import scala.collection.mutable.{ArrayBuffer, HashMap}
+import org.clulab.dynet.Utils.initializeDyNet
 import org.clulab.processors.Processor
-import org.clulab.processors.fastnlp.FastNLPProcessor
+import org.clulab.processors.clu.CluProcessor
 
 case class ResultView(args: Seq[ArgString]) {
   def toArgMap: Map[String, String] = {
@@ -29,7 +30,12 @@ class Consolidator(
 
   def this(processor: Processor) = this(processor, HashMap.empty, HashMap.empty, HashMap.empty)
 
-  def this() = this(new FastNLPProcessor)
+  def this() = this({
+    initializeDyNet();
+    new CluProcessor()
+  })
+
+
 
 //  def keys = display.values
 
