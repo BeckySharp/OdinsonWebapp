@@ -132,7 +132,7 @@ class CorpusReader(
       nc <- namedCaptures
       argName = nc.name
       capturedMatch = nc.capturedMatch
-      tokens = extractorEngine.dataGatherer.getTokens(luceneDocID, capturedMatch).toSeq
+      tokens = extractorEngine.dataGatherer.getTokensForSpan(luceneDocID, capturedMatch).toSeq
       normalizedTokens = if (consolidateByLemma) convertToLemmas(tokens) else tokens
     } yield NormalizedArg(argName, normalizedTokens, tokens)
   }
