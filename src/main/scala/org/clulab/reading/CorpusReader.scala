@@ -100,7 +100,7 @@ class CorpusReader(
       // Get the source for the extraction, store in wrapper class Evidence
       luceneDocID = mention.luceneDocId
       docId = s"${mention.docId}:${mention.sentenceId}"
-      sentence = extractorEngine.getTokens(luceneDocID, extractorEngine.displayField).mkString(" ")
+      sentence = extractorEngine.dataGatherer.getTokens(luceneDocID, extractorEngine.dataGatherer.displayField).mkString(" ")
       evidence = Evidence(docId, sentence)
       // Get the name of the rule that found the extraction
       foundBy = mention.foundBy
@@ -132,7 +132,7 @@ class CorpusReader(
       nc <- namedCaptures
       argName = nc.name
       capturedMatch = nc.capturedMatch
-      tokens = extractorEngine.getTokens(luceneDocID, capturedMatch).toSeq
+      tokens = extractorEngine.dataGatherer.getTokensForSpan(luceneDocID, capturedMatch).toSeq
       normalizedTokens = if (consolidateByLemma) convertToLemmas(tokens) else tokens
     } yield NormalizedArg(argName, normalizedTokens, tokens)
   }
