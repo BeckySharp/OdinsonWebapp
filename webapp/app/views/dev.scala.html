@@ -39,9 +39,12 @@ vars:
 
 rules:
   - name: example-rule
-    type: basic
+    type: event
+    label: Causal
     pattern: |
-       (?<cause> ${chunk}) <nsubj (?<trigger> [lemma=/cause|increase|decrease|affect/]) >dobj (?<effect> ${chunk})
+       trigger = [lemma=/cause|increase|decrease|affect/]
+       cause:^Entity = >nsubj ${chunk}
+       effect:^Entity = >dobj ${chunk}
 
     </textarea>
     <input id="saveRulesBtn" class="submitbutton" type="button" value="SAVE RULES">
