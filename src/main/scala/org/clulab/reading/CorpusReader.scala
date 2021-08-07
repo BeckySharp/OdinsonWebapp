@@ -79,6 +79,16 @@ class CorpusReader(
     extractMatches(extractors)
   }
 
+  def extractMentionsFromRules(rules: String): Seq[Mention] = {
+    val extractors = extractorEngine.compileRuleString(rules)
+    extractMentions(extractors)
+  }
+
+  def extractMentionsFromRules(rules: Seq[Rule]): Seq[Mention] = {
+    val extractors = extractorEngine.ruleReader.mkExtractors(rules)
+    extractMentions(extractors)
+  }
+
 
   /**
    * Apply extractors to corpus to get the matches
@@ -86,10 +96,15 @@ class CorpusReader(
    * @return sequence of Match
    */
   def extractMatches(extractors: Seq[Extractor]): Seq[Match] = {
-    val mentions = extractorEngine.extractMentions(extractors).toArray
-    extractorEngine.clearState()
+    val mentions = extractMentions(extractors)
     // Convert the mentions into our Match objects
     getMatches(mentions)
+  }
+
+  def extractMentions(extractors: Seq[Extractor]): Seq[Mention] = {
+    val mentions = extractorEngine.extractMentions(extractors).toArray
+    extractorEngine.clearState()
+    mentions
   }
 
   private def getMatches(mentions: Seq[Mention]): Seq[Match] = {

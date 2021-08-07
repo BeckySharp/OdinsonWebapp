@@ -1,0 +1,62 @@
+<html>
+<head>
+    <title>OdinsonWebapp Dev Helper</title>
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
+    <link rel="stylesheet" href="assets/plugins/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" type="text/css" href="assets/brat/static/style-vis.css"/>
+    <script type="text/javascript" src="assets/brat/client/lib/head.load.min.js"></script>
+    <script type="text/javascript" src="assets/javascripts/jquery-3.2.1.min.js"></script>
+    <script src="assets/plugins/codemirror/lib/codemirror.js"></script>
+    <script src="assets/plugins/codemirror/addon/edit/matchbrackets.js"></script>
+    <script src="assets/plugins/codemirror/addon/edit/closebrackets.js"></script>
+    <script src="assets/plugins/codemirror/addon/comment/comment.js"></script>
+    <script src="assets/plugins/codemirror/mode/yaml-odinson/yaml-odinson.js"></script>
+    <script type="text/javascript" src="assets/javascripts/sweetalert.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css"/>
+    <script type="text/javascript" src="assets/javascripts/parse.js"></script>
+</head>
+
+<body>
+<h1>Rule Development Helper</h1>
+
+<div id="overlay">
+    <div id="loading">
+        <img src="assets/images/loading.svg">
+        processing...
+    </div>
+</div>
+
+<form>
+    <textarea name="text" rows="3" cols="100"></textarea>
+    <br>
+    <br>
+    <label for="rules">Rules:</label>
+    <textarea id="rules" name="rules" class="codemirror-textarea" rows="10" cols="100">
+vars:
+  chunk: "([tag=/J.*/]{,3} [tag=/N.*/]+ (of [tag=DT]? [tag=/J.*/]{,3} [tag=/N.*/]+)?)"
+
+rules:
+  - name: example-rule
+    type: event
+    label: Causal
+    pattern: |
+       trigger = [lemma=/cause|increase|decrease|affect/]
+       cause:^Entity = >nsubj ${chunk}
+       effect:^Entity = >dobj ${chunk}
+    </textarea>
+
+    <br />
+    <input type="submit">
+</form>
+
+<div id="mentions"></div>
+
+<br>
+
+<div id="syntax"></div>
+
+<div id="groundedAdj" class="add-info"></div>
+
+<table id="parse"></table>
+</body>
+</html>
