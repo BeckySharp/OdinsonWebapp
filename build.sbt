@@ -11,6 +11,8 @@ resolvers ++= Seq(
 
 val procVer = "8.2.3"
 val odinsonVer = "0.4.0"
+val akkaVersion = "2.6.8"
+val akkaHttpVersion = "10.2.4"
 
 libraryDependencies ++= Seq(
   "org.clulab" %% "processors-main" % procVer,
@@ -18,6 +20,10 @@ libraryDependencies ++= Seq(
   "ai.lum" %% "common" % "0.0.10",
   "com.lihaoyi" %% "ujson" % "0.7.1",
   "com.lihaoyi" %% "upickle" % "0.7.1",
+  "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+  "com.typesafe.akka" %% "akka-stream" % akkaVersion,
+  "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
+  "com.typesafe.akka" %% "akka-slf4j"  % akkaVersion,
   guice
 )
 
