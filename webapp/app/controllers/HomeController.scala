@@ -12,7 +12,7 @@ import org.clulab.reading.{CorpusReader, DependencySearcher, Match, RuleBuilder,
 import org.clulab.reading.Consolidator._
 import org.clulab.reading.CorpusReader._
 import org.clulab.reading.utils.DisplayUtils
-import play.api.mvc._
+import play.api.mvc.{Action, _}
 
 
 /**
@@ -25,6 +25,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   // -------------------------------------------------
   lazy val reader = CorpusReader.fromConfig
   lazy val proc = {
+    println("Initializing the CluProcessor")
     initializeDyNet()
     new CluProcessor()
   }
@@ -55,6 +56,11 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def simple() = Action { implicit request: Request[AnyContent] =>
     initializeCorpusReader()
     Ok(views.html.simple())
+  }
+
+  def parser(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    initializeCorpusReader()
+    Ok(views.html.parse())
   }
 
   def getCustomRuleResults(rules: String, exportMatches: Boolean) = Action {
@@ -120,6 +126,15 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   }
 
 
+  def processTextDynamic(sent: String, rules: String) = Action {
+    println(s"Parsing sent: $sent")
+    val textReader = new TextReader(proc, rules)
+    val doc = textReader.mkPartialAnnotation(sent)
+    val mentions = textReader.extractMentions(doc, populate = true).toVector
+    val json = BratUtils.mkJson(sent, doc, mentions)
+    Ok(json)
+  }
+
   def processText: Action[AnyContent] = Action { request =>
     val data = request.body.asJson.get.toString()
     val j = ujson.read(data)
@@ -127,10 +142,10 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val textReader = TextReader.fromFile(proc, rules)
     assert(!( j.obj.keySet.contains("textfile") && j.obj.keySet.contains("text") ),
       "You cannot pass both a textfile and text in a single request.")
-    val matches = if (j.obj.get("textfile").isDefined) {
+    val matches = if (j.obj.contains("textfile")) {
       val textFile = j("textfile").str
       textReader.extractMatchesFromFile(textFile)
-    } else if (j.obj.get("text").isDefined) {
+    } else if (j.obj.contains("text")) {
       val text = j("text").str
       textReader.extractMatches(text)
     } else {

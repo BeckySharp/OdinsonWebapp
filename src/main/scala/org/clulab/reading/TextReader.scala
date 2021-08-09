@@ -3,9 +3,10 @@ package org.clulab.reading
 import ai.lum.common.ConfigUtils._
 import ai.lum.common.TryWithResources._
 import ai.lum.common.ConfigFactory
-import ai.lum.odinson.{ExtractorEngine, Document => OdinsonDocument}
-import org.clulab.processors.{Document => ProcDocument, Processor}
+import ai.lum.odinson.{ExtractorEngine, Mention, Document => OdinsonDocument}
+import org.clulab.processors.{Processor, Document => ProcDocument}
 import TextReader.fileContents
+import ai.lum.odinson.DataGatherer.VerboseLevels
 import utils.OdinsonUtils.convertDocument
 
 import scala.io.Source
@@ -27,6 +28,25 @@ class TextReader(val proc: Processor, val rules: String) {
 
   def extractMatchesFromFile(filename: String): Seq[Match] = {
     extractMatches(fileContents(filename))
+  }
+
+  def extractMentions(text: String, populate: Boolean): Seq[Mention] = {
+    val procDoc = mkPartialAnnotation(text)
+    extractMentions(procDoc, populate)
+  }
+
+  def extractMentions(doc: ProcDocument, populate: Boolean): Seq[Mention] = {
+    val odinsonDocument = convertDocument(doc)
+    val mentions = extractMentions(odinsonDocument)
+    if (populate) mentions.foreach(_.populateFields(VerboseLevels.All))
+    mentions
+  }
+
+  def extractMentions(doc: OdinsonDocument): Seq[Mention] = {
+    val ee = mkExtractorEngine(doc)
+    val reader = new CorpusReader(ee, numEvidenceDisplay, consolidateByLemma)
+    reader.proc = Some(proc)
+    reader.extractMentionsFromRules(rules)
   }
 
   def extractMatches(text: String): Seq[Match] = {
