@@ -10,7 +10,7 @@ resolvers ++= Seq(
 )
 
 val procVer = "8.2.3"
-val odinsonVer = "0.4.0"
+val odinsonVer = "0.5.0"
 val akkaVersion = "2.6.8"
 val akkaHttpVersion = "10.2.4"
 
