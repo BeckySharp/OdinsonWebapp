@@ -13,6 +13,10 @@ object DisplayUtils {
   protected val tab = "\t"
 
   implicit class StringImprovements(s: String) {
+    def wordWrap(maxLength: Int, indentation: String): String = {
+      val lines = wrap(maxLength)
+      lines.map(line => s"${indentation}$line").mkString("\n")
+    }
     def wordWrap(maxLength: Int, indentation: Int): String = {
       val lines = wrap(maxLength)
       lines.map(line => s"${indent(indentation)}$line").mkString("\n")
@@ -32,15 +36,15 @@ object DisplayUtils {
     val docId = s"doc: ${m.docId}\tsent: ${m.sentenceId}"
     val lines = new ArrayBuffer[String]
     lines.append(s"{")
-    lines.append(s"  source:   ${docId}")
-    lines.append(s"  sentence: \n${m.documentFields("raw").mkString(" ").wordWrap(100, 6)}")
-    lines.append(s"  foundBy:  ${m.foundBy}")
-    lines.append(s"  label:    ${m.label.getOrElse("<NONE>")}")
-    lines.append(s"  text/trigger:     ${m.text}")
+    lines.append(s"\tsource:   ${docId}")
+    lines.append(s"\tsentence: \n${m.documentFields("raw").mkString(" ").wordWrap(100, "\t\t")}")
+    lines.append(s"\tfoundBy:  ${m.foundBy}")
+    lines.append(s"\tlabel:    ${m.label.getOrElse("<NONE>")}")
+    lines.append(s"\ttext/trigger:     ${m.text}")
 
     // Display the arguments
     if (m.arguments.nonEmpty) {
-      lines.append("\n  arguments:")
+      lines.append("\n\t\targuments:")
       val argKeys = m.arguments.keySet
       // Handle each of the arguments
       for (argName <- argKeys) {
@@ -60,7 +64,7 @@ object DisplayUtils {
       text = m.text
       label = m.label.getOrElse("")
     } yield {
-      s"  \t$argName($label): ${text}"
+      s"\t\t$argName($label): ${text}"
     }
   }
 
@@ -87,6 +91,4 @@ object DisplayUtils {
       .escape(displayString(mention))
       .replaceAll(nl, "<br>")
       .replaceAll(tab, "&nbsp;&nbsp;&nbsp;&nbsp;")
-
-
 }

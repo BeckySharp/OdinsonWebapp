@@ -31,6 +31,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   }
   lazy val ruleBuilder = new RuleBuilder()
   var nmodSearcher: Option[DependencySearcher] = None
+  lazy val bratUtils = BratUtils.fromConfig
   println("OdinsonWebapp is ready to go ...")
   // -------------------------------------------------
   def initializeCorpusReader(): Unit = {
@@ -67,7 +68,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     // Make sure the reader is initialized
     initializeCorpusReader()
 
-    val matches = reader.extractMatchesFromRules(rules)
+    val matches = reader.extractMatchesFromRules(rules, true)
     if (exportMatches) {
       exportResults(ruleNameHack(rules), matches)
     }
@@ -88,7 +89,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val j = ujson.read(data)
     val ruleName = j.obj.get("ruleName").map(_.str).getOrElse("NO_NAME")
     val rules = ruleBuilder.buildRules(j)
-    val matches = reader.extractMatchesFromRules(rules)
+    val matches = reader.extractMatchesFromRules(rules, true)
     val reformatted = DisplayUtils.replaceTriggerName(j, matches)
     // TODO: export if desired
     val results = consolidateAndRank(reformatted, proc)
@@ -130,8 +131,8 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     println(s"Parsing sent: $sent")
     val textReader = new TextReader(proc, rules)
     val doc = textReader.mkPartialAnnotation(sent)
-    val mentions = textReader.extractMentions(doc, populate = true).toVector
-    val json = BratUtils.mkJson(sent, doc, mentions)
+    val mentions = textReader.extractMentions(doc, populate = true, topLevelOnly = false).toVector
+    val json = bratUtils.mkJson(sent, doc, mentions)
     Ok(json)
   }
 
@@ -144,10 +145,10 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
       "You cannot pass both a textfile and text in a single request.")
     val matches = if (j.obj.contains("textfile")) {
       val textFile = j("textfile").str
-      textReader.extractMatchesFromFile(textFile)
+      textReader.extractMatchesFromFile(textFile, topLevelOnly = false)
     } else if (j.obj.contains("text")) {
       val text = j("text").str
-      textReader.extractMatches(text)
+      textReader.extractMatches(text, topLevelOnly = false)
     } else {
       throw new RuntimeException("You must pass either a `textfile` or a `text`")
     }

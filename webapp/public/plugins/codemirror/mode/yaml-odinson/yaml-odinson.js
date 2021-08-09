@@ -34,7 +34,7 @@ CodeMirror.defineMode("yaml", function() {
       }
 
       // this is where we can add some more color for vars/rules
-      if (stream.match(/(vars|rules):/)) { return 'atom-odinson-2'; }
+      if (stream.match(/(vars|rules|metadataFilters):/)) { return 'atom-odinson-2'; }
       /* this is for the argnames that match */
       if (stream.sol() && stream.match(/^\s*?(\s*?)(\w+?)(: ?\^? ?\w+)?(\s*?)([?*+]\s*?)?=\s*?/)) { return 'variable-argname'; }
 //      if (stream.match(/(\?\<\w+?\>)/)) { return 'odinson-named-captures'; }

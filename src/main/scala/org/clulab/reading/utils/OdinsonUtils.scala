@@ -13,7 +13,6 @@ object OdinsonUtils {
 
   // load field names from config
   val config = ConfigFactory.load()
-  val documentIdField   = config.apply[String]("odinson.index.documentIdField")
   val rawTokenField     = config.apply[String]("odinson.index.rawTokenField")
   val wordTokenField    = config.apply[String]("odinson.index.wordTokenField")
   val lemmaTokenField   = config.apply[String]("odinson.index.lemmaTokenField")

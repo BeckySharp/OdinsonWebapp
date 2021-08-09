@@ -26,36 +26,36 @@ class TextReader(val proc: Processor, val rules: String) {
   val numEvidenceDisplay = config.get[Int]("ui.numEvidenceDisplay").getOrElse(3)
   val consolidateByLemma = config.get[Boolean]("ui.lemmaConsolidation").getOrElse(true)
 
-  def extractMatchesFromFile(filename: String): Seq[Match] = {
-    extractMatches(fileContents(filename))
+  def extractMatchesFromFile(filename: String, topLevelOnly: Boolean): Seq[Match] = {
+    extractMatches(fileContents(filename), topLevelOnly)
   }
 
-  def extractMentions(text: String, populate: Boolean): Seq[Mention] = {
+  def extractMentions(text: String, populate: Boolean, topLevelOnly: Boolean): Seq[Mention] = {
     val procDoc = mkPartialAnnotation(text)
-    extractMentions(procDoc, populate)
+    extractMentions(procDoc, populate, topLevelOnly)
   }
 
-  def extractMentions(doc: ProcDocument, populate: Boolean): Seq[Mention] = {
+  def extractMentions(doc: ProcDocument, populate: Boolean, topLevelOnly: Boolean): Seq[Mention] = {
     val odinsonDocument = convertDocument(doc)
-    val mentions = extractMentions(odinsonDocument)
+    val mentions = extractMentions(odinsonDocument, topLevelOnly)
     if (populate) mentions.foreach(_.populateFields(VerboseLevels.All))
     mentions
   }
 
-  def extractMentions(doc: OdinsonDocument): Seq[Mention] = {
+  def extractMentions(doc: OdinsonDocument, topLevelOnly: Boolean): Seq[Mention] = {
     val ee = mkExtractorEngine(doc)
-    val reader = new CorpusReader(ee, numEvidenceDisplay, consolidateByLemma)
+    val reader = new CorpusReader(ee, numEvidenceDisplay, "raw", "word", "lemma", consolidateByLemma)
     reader.proc = Some(proc)
-    reader.extractMentionsFromRules(rules)
+    reader.extractMentionsFromRules(rules, topLevelOnly)
   }
 
-  def extractMatches(text: String): Seq[Match] = {
+  def extractMatches(text: String, topLevelOnly: Boolean): Seq[Match] = {
     val procDoc = mkPartialAnnotation(text)
     val odinsonDocument = convertDocument(procDoc)
     val ee = mkExtractorEngine(odinsonDocument)
-    val reader = new CorpusReader(ee, numEvidenceDisplay, consolidateByLemma)
+    val reader = new CorpusReader(ee, numEvidenceDisplay, "raw", "word", "lemma", consolidateByLemma)
     reader.proc = Some(proc)
-    reader.extractMatchesFromRules(rules)
+    reader.extractMatchesFromRules(rules, topLevelOnly)
   }
 
   def mkPartialAnnotation(text: String): ProcDocument = {

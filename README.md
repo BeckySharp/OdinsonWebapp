@@ -39,6 +39,17 @@ with the local datetime (e.g., `example-rule_2020-04-08_10:47:36.jsonl`).
 
 ![image](docs/images/export.png)
 
+## Parser view (New!)
+
+If you want to see what a set of rules will extract from a particular sentence, you can use the endpoint:
+ 
+    localhost:9000/parse
+
+In this view, you can add rules and a text and view the extractions.  Also shown is the syntactic annotation information _using a CluProcessor_. (Meaning that it may not match what you used to make the index, but it's likely to be informative since the parser is trained on universal dependencies.)
+Please note that the first query you submit will be a little slow.
+
+![image](docs/images/parse.png)
+
 ## Docker
 
 You can build this into a container with:
