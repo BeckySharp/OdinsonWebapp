@@ -1,11 +1,15 @@
 package controllers
 
+import ai.lum.common.ConfigFactory
+import ai.lum.common.ConfigUtils.LumAICommonConfigWrapper
 import ai.lum.odinson.{Mention, OdinsonMatch}
 import org.clulab.processors.{Document, Sentence}
 import org.clulab.reading.utils.DisplayUtils
 import play.api.libs.json._
 
-object BratUtils {
+import scala.collection.mutable.ArrayBuffer
+
+class BratUtils(displayString: String) {
   protected def mkParseObj(sentence: Sentence, sb: StringBuilder): Unit = {
     def getTdAt(option: Option[Array[String]], n: Int): String = {
       val text = if (option.isEmpty) ""
@@ -86,40 +90,58 @@ object BratUtils {
   }
 
   def mkJsonForEidos(sentenceText: String, sent: Sentence, mentions: Vector[Mention]): Json.JsValueWrapper = {
-    // collect "textbound" and event mentions for display
-    val (topLevelNonevents, events) = mentions.partition(_.arguments.isEmpty)
+    val (topLevelNonevents, eventsAndRelations) = mentions.partition(_.arguments.isEmpty)
+//    val (relations, events) = eventsAndRelations.partition(isRelationMention)
     val topLevelTBMs = topLevelNonevents.map(TextBoundMention.fromMention)
 
+    // Handle Events:
     // collect triggers for event mentions
-    val triggers = events.flatMap { e =>
+    val eventTriggers = new ArrayBuffer[TextBoundMention]
+    val eventEntities = new ArrayBuffer[TextBoundMention]
+
+    eventsAndRelations.foreach { event =>
+
+      val eTBMs = event.arguments match {
+        case hasTriggerArg if hasTriggerArg.contains("trigger") =>
+          hasTriggerArg("trigger").toSeq
+            .map(_.copy(label = event.label))
+            .map(TextBoundMention.fromMention)
+
+        case _ => Seq(TextBoundMention.fromMention(event))
+      }
+      eventTriggers.appendAll(eTBMs)
+
       val argTriggers = for {
-        a <- e.arguments.values.flatten
+        a <- event.arguments.values.flatten
         if a.arguments.nonEmpty
+        if !(a.start == event.start && a.end == event.end)
       } yield TextBoundMention.fromMention(a)
-      val eTBM = TextBoundMention.fromMention(e)
-      eTBM +: argTriggers.toSeq
+      eventTriggers.appendAll(argTriggers)
+
+      // collect event arguments as text bound mentions
+      val eventEnts = for {
+        e <- eventsAndRelations
+        a <- e.arguments.values.flatten
+      } yield TextBoundMention.fromMention(a)
+      eventEntities.appendAll(eventEnts)
     }
 
-    // collect event arguments as text bound mentions
-    val entities = for {
-      e <- events
-      a <- e.arguments.values.flatten
-    } yield TextBoundMention.fromMention(a)
-
     // generate id for each textbound mention
-    val tbMentionToId = (entities ++ triggers ++ topLevelTBMs)
+    val tbMentionToId = (eventEntities ++ eventTriggers ++ topLevelTBMs)
       .distinct
       .zipWithIndex
       .map { case (m, i) => (m, i + 1) }
       .toMap
+
     // return brat output
     Json.obj(
       "text" -> sentenceText,
-      "entities" -> mkJsonFromEntities(entities ++ topLevelTBMs, tbMentionToId),
-      "triggers" -> mkJsonFromEntities(triggers, tbMentionToId),
-      "events" -> mkJsonFromEventMentions(events, tbMentionToId)
+      "entities" -> mkJsonFromEntities((eventEntities ++ topLevelTBMs).toVector, tbMentionToId),
+      "triggers" -> mkJsonFromEntities(eventTriggers.toVector, tbMentionToId),
+      "events" -> mkJsonFromEventMentions(eventsAndRelations, tbMentionToId)
     )
   }
+
 
   def mkJsonFromEntities(mentions: Vector[TextBoundMention], tbmToId: Map[TextBoundMention, Int]): Json.JsValueWrapper = {
     val entities = mentions.map(m => mkJsonFromTextBoundMention(m, tbmToId(m)))
@@ -135,7 +157,6 @@ object BratUtils {
     )
   }
 
-  //
   def mkJsonFromEventMentions(ee: Seq[Mention], tbmToId: Map[TextBoundMention, Int]): Json.JsValueWrapper = {
     var i = 0
     val jsonEvents = for (e <- ee) yield {
@@ -150,14 +171,15 @@ object BratUtils {
     Json.arr(
       s"E$i",
       s"T${tbmToId(triggerTBM)}",
-      Json.arr(mkArgMentions(ev, tbmToId): _*)
+      Json.arr(mkArgMentions(ev.start, ev.end, ev.arguments, tbmToId): _*)
     )
   }
 
-  def mkArgMentions(ev: Mention, tbmToId: Map[TextBoundMention, Int]): Seq[Json.JsValueWrapper] = {
+  def mkArgMentions(start: Int, end: Int, arguments: Map[String, Array[Mention]], tbmToId: Map[TextBoundMention, Int]): Seq[Json.JsValueWrapper] = {
     val args = for {
-      argRole <- ev.arguments.keys
-      m <- ev.arguments(argRole)
+      argRole <- arguments.keys
+      m <- arguments(argRole)
+      if !(start == m.start && end == m.end)
     } yield {
       val arg = TextBoundMention.fromMention(m)
       mkArgMention(argRole, s"T${tbmToId(arg)}")
@@ -219,7 +241,9 @@ object BratUtils {
     )
   }
 
-  case class TextBoundMention(odinsonMatch: OdinsonMatch, text: String, label: String, startOffset: Int, endOffset: Int) {}
+  case class TextBoundMention(start: Int, end: Int, text: String, label: String, startOffset: Int, endOffset: Int) {
+
+  }
   object TextBoundMention {
     def apply(odinsonMatch: OdinsonMatch, text: String, label: Option[String], sentenceRaw: Seq[String]): TextBoundMention = {
       var startOffset = 0
@@ -228,13 +252,21 @@ object BratUtils {
       }
       startOffset += odinsonMatch.start // add the spaces
       val endOffset = startOffset + text.length
-      TextBoundMention(odinsonMatch, text, label.getOrElse("_no_label_"), startOffset, endOffset)
+      TextBoundMention(odinsonMatch.start, odinsonMatch.end, text, label.getOrElse("Mention"), startOffset, endOffset)
     }
     def fromMention(m: Mention): TextBoundMention = {
-      apply(m.odinsonMatch, m.text, m.label, m.documentFields("raw"))
+      apply(m.odinsonMatch, m.text, m.label, m.documentFields(displayString))
     }
   }
 
 
   def tab():String = "&nbsp;&nbsp;&nbsp;&nbsp;"
+}
+
+object BratUtils {
+  def fromConfig: BratUtils = {
+    val config = ConfigFactory.load()
+    val displayField = config.get[String]("ui.displayField").getOrElse("raw")
+    new BratUtils(displayField)
+  }
 }
