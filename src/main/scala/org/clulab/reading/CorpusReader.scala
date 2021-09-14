@@ -113,9 +113,8 @@ class CorpusReader(
   }
 
   private def getMatches(mentions: Seq[Mention]): Seq[Match] = {
-    for {
+    val matches : Seq[Match ] = for {
       mention <- mentions
-      _ = println(mention.arguments.keySet.mkString(", "))
       // Get the source for the extraction, store in wrapper class Evidence
       docId = s"${mention.docId}:${mention.sentenceId}"
       sentence = sentenceText(mention)
@@ -128,10 +127,10 @@ class CorpusReader(
       // of all the arguments
       pseudoIdentity = mkPseudoIdentity(docId, args)
     } yield {
-      val mm = Match(docId, foundBy, pseudoIdentity, evidence)
-      println(mm)
-      mm
+      Match( docId, foundBy, pseudoIdentity, evidence )
     }
+      println(s"number of matches: ${matches.size}")
+      matches
   }
 
 

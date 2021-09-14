@@ -62,7 +62,7 @@ docker build -t odinsonwebapp .
 This generates a container named `odinsonwebapp`, which can be run using:
 
 ```
-docker run -it --rm -v $PWD:/root/webapp -p 9000:9000 -m=4gb -d odinsonwebapp
+docker run -it --rm -v $PWD:/root/webapp -p 9000:9000 -d odinsonwebapp
 ```
 
 Note that the index for the Docker container is expected to be located in `docker/index` at the top level of this repository. You also need to ensure that `src/main/resources/application.conf` has `odinson.indexDir = "/root/webapp/docker/index"` for its index. You can either place your index at `docker/index` or mount some other index directory. If, for example you were to mount `/localhost/data/index` to `/index` with `-v /localhost/data/index:/index` you should update `src/main/resources/application.conf` so that `odinson.indexDir = "/index"`.

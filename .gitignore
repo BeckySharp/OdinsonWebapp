@@ -4,6 +4,9 @@
 *.json
 *.jsonl
 
+docker/index/*
+!docker/index/.gitkeep
+
 .idea/
 target
 project/project
