@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+
+  odinson-webapp:
+    build:
+      context: .
+    container_name: odinson-webapp
+    hostname: odinson-webapp
+    restart: unless-stopped
+    volumes:
+      - $PWD/docker/index:/root/webapp/docker/index
+    ports:
+      - 9000:9000
+    networks:
+      - lumai-net
+
+networks:
+  lumai-net:
